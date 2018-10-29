@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:450px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+        var myChart = document.getElementById('main');
+        if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }   
+    }
+
+var itemStyle = {
+    normal: {
+        opacity: 0.8,
+        shadowBlur: 10,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        shadowColor: 'rgba(0, 0, 0, 0.5)'
+    }
+};
+    var alldata = %s
+    var myChart = echarts.init(myChart); 
+    var selectes = '';
+       var option = {
+    title : {
+        text: '',
+        left: 'center',
+    },
+    tooltip : {
+    },
+    legend:
+    {
+    	data:[]
+    },
+   dataZoom: [
+        {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'empty'
+        },
+        {
+            type: 'slider',
+            yAxisIndex: 0,
+            filterMode: 'empty'
+        },
+    ],
+    xAxis : [
+        {
+            type : 'value',
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+        }
+    ],
+    series : [
+          
+    ]
+};
+        load()
+
+    function load()
+    {
+    	legend = []
+        for (key in alldata)
+        {
+        	temp = {
+		        symbolSize: 5,
+		        data:alldata[key],
+		        type: 'scatter'
+		    }
+        	option.series.push(temp)
+        	legend.push(key)
+        }
+        option.legend.data = legend
+        myChart.setOption(option);
+    }
+        
+    </script>
+</body>
+</html>

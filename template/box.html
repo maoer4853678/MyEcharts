@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>时序箱线图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts1.min.js"></script>
+    <script src="../js/ecStat.js"></script>
+    <script src="../js/dataTool.min.js"></script>
+</head>
+<body >
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:470px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+    var myChart = document.getElementById('main');
+    if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }	
+    }
+    var alldata = %s
+    var xAxis = %s
+    var lines = %s
+    var myChart = echarts.init(myChart); 
+    var data = dataTool.prepareBoxplotData(alldata);
+    
+option = {
+    title: [
+        {
+            text: '时序箱线图',
+            left: 'left',
+        }
+    ],
+    tooltip: {
+        trigger: 'item',
+        axisPointer: {
+            type: 'shadow'
+        }
+    },
+    legend:
+    {
+    	data:['box',"outlier",'median']
+    },
+    dataZoom: [
+        {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'empty'
+        },
+        {
+            type: 'slider',
+            yAxisIndex: 0,
+            filterMode: 'empty'
+        },
+    ],
+    xAxis: {
+        type: 'category',
+        data: xAxis,
+        boundaryGap: true,
+        nameGap: 30,
+        splitArea: {
+            show: false
+        },
+        splitLine: {
+            show: false
+        }
+    },
+    yAxis: {
+        type: 'value',
+        splitArea: {
+            show: true
+        }
+    },
+    series: [
+        {
+            name: 'box',
+            type: 'boxplot',
+            data: data.boxData,
+            tooltip: {
+                formatter: function (param) {
+                    return [
+                        '日期' + param.name + ': ',
+                        '上界: ' + param.data[5],
+                        '三分位: ' + param.data[4],
+                        '中位数: ' + param.data[3],
+                        '一分位: ' + param.data[2],
+                        '下界: ' + param.data[1]
+                    ].join('<br/>');
+                }
+            }
+        },
+        {
+            name: 'outlier',
+            type: 'scatter',
+            data: data.outliers
+        },
+        {
+        	name:"median",
+        	type:"line",
+        	data: lines
+        }
+    ]
+};
+		myChart.setOption(option);
+
+        // 使用刚指定的配置项和数据显示图表。
+        
+    </script>
+</body>
+</html>

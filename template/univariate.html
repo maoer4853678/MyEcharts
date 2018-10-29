@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>单变量散点图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts1.min.js"></script>
+    <script src="../js/dataTool.min.js"></script>
+    <script src="../js/jquery.js"></script>
+</head>
+<body >
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <select id="variates" onchange="Change(this)" > </select>
+    <input  id = "trackBar" type="range" min="0" max="50" value="10" onchange="ChangeSym() " />
+    <div id="main" style="width: 1500px;height:470px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+    var myChart = document.getElementById('main');
+    if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }	
+    }
+    var alldata = %s
+    var columns = %s
+    var myChart = echarts.init(myChart); 
+    var data = dataTool.prepareBoxplotData(alldata);
+    
+option = {
+    title: [
+        {
+            text: '',
+            left: 'right',
+        }
+    ],
+    tooltip: {
+        trigger: 'item',
+        axisPointer: {
+            type: 'shadow'
+        }
+    },
+    legend:
+    {
+        data:[]
+    },
+    dataZoom: [
+        {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'empty'
+        },
+        {
+            type: 'slider',
+            yAxisIndex: 0,
+            filterMode: 'empty'
+        },
+    ],
+    xAxis: {
+        type: 'value',
+    },
+    yAxis: {
+        type: 'value',
+    },
+    series: []
+};
+    load()
+
+    function load()
+    {
+        var objSelect = document.getElementById("variates");
+        for (var i=0;i<columns.length;i++) {
+          objSelect.options.add(new Option(columns[i],columns[i]));
+        }
+        Change(objSelect)
+    }
+
+    function Change(selectObj)
+    {
+        var  variate= $(selectObj).val();
+        data = alldata[variate]
+        legend = []
+        series = []
+        var value = parseFloat($("#trackBar").val());
+        for (key in data)
+        {
+            legend.push(key)
+            temp = {
+                name:'',
+                type: 'scatter',
+                data:[],
+                symbolSize:value
+                }
+            temp.name = key
+            temp.data = data[key]
+            series.push(temp)
+        }
+        option.legend.data = legend
+        option.series = series
+        option.title[0].text = variate
+        myChart.setOption(option);
+    }
+
+    function ChangeSym(){
+        //获取信息
+        var value = parseFloat($("#trackBar").val());
+        for (var i=0;i<option.series.length;i++) {
+            option.series[i].symbolSize = value
+        }
+        myChart.setOption(option);
+        //将信息显示
+    }
+
+    </script>
+</body>
+</html>
