@@ -30,7 +30,7 @@
     df['times'] = pd.date_range(start = '2018-01-02 00:00:00',freq = "1D",periods = len(df))
     Plot_Box(df,'times','var1',kind = 'month')
 
-![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/box.png)
+![Image text](./image/box.png)
 
     Plot_Univariate :  绘制多个变量和目标变量的散点图
     Example:
