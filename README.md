@@ -32,7 +32,7 @@ Example:
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
     df['class'] = ['A']*25+['B']*25
     Plot_Univariate(df,'target','class')
-![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/univariate.jpg)
+![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/univariate.png)
 
 Plot_Scatter :  绘制一对变量的散点图
 Example:
@@ -40,5 +40,5 @@ Example:
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
     df['class'] = ['A']*25+['B']*25
     Plot_Scatter(df,'var1',"var2",label ='class')
-![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/scatter.jpg)
+![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/scatter.png)
 
