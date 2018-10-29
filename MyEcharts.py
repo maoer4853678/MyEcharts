@@ -156,9 +156,11 @@ def Plot_Scatter(df,x,y,root = "Scatter_analysis",name = "scatter",label =None,w
     '''
     dfs = {}
     if label:
+        df =df[[x,y,label]]
         for key in df[label].drop_duplicates():
             dfs[str(key)] = df[df[label]==key].values.tolist()
     else :
+        df =df[[x,y]]
         dfs['all'] = df.values.tolist()
         
     template = get_template('scatter')
