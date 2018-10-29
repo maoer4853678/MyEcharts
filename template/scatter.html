@@ -21,7 +21,7 @@
             myChart.style.height = window.innerHeight-30+'px';
         }   
     }
-
+             
 var itemStyle = {
     normal: {
         opacity: 0.8,
@@ -79,6 +79,7 @@ var itemStyle = {
         for (key in alldata)
         {
         	temp = {
+                name:key,
 		        symbolSize: 5,
 		        data:alldata[key],
 		        type: 'scatter'
