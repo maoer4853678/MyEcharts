@@ -6,50 +6,53 @@ API 特性
 2.每个功能函数可以在 Jupyter notebook 中output出在线网页，下面有示意图说明，功能函数中的参数 show  时表示是否显示output网页，默认显示
 
 API 目录架构
-*/js
-**    /dataTool.js
-**    /dataTool.min.js
-**    /echarts.js
-**    /echarts.min.js
-**    /echarts.sankey.js
-**    /ecStat.js
-**    /jquery.js
-*/templates
-**    /box.html
-**    /scatter.html
-**    /univariate.html
-*MyEcharts.py
+    /js
+        /dataTool.js
+        /dataTool.min.js
+        /echarts.js
+        /echarts.min.js
+        /echarts.sankey.js
+        /ecStat.js
+        /jquery.js
+    /templates
+        /box.html
+        /scatter.html
+        /univariate.html
+    MyEcharts.py
 
 
 目前支持分析模板及对应函数 
 Plot_Box :  绘制基于时间序列的箱线图
-    Example:
-`<
+Example:
+'''python
     from MyEcharts import Plot_Box
     df = pd.DataFrame(np.random.rand(70,4),columns = ['var1','var2','var3','var4'])
     df['times'] = pd.date_range(start = '2018-01-02 00:00:00',freq = "1D",periods = len(df))
     Plot_Box(df,'times','var1',kind = 'month')
->`
+end'''
+
 ![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/box.png)
 
 Plot_Univariate :  绘制多个变量和目标变量的散点图
     Example:
-`<
+'''python
     from MyEcharts import Plot_Univariate
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
     df['class'] = ['A']*25+['B']*25
     Plot_Univariate(df,'target','class')
->`
+end'''
+
 ![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/univariate.png)
 
 Plot_Scatter :  绘制一对变量的散点图
     Example:
-`<
+'''python
     from MyEcharts import Plot_Scatter
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
     df['class'] = ['A']*25+['B']*25
     Plot_Scatter(df,'var1',"var2",label ='class')
->`
+end'''
+
 ![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/scatter.png)
 
 
