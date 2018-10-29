@@ -41,7 +41,7 @@
     Plot_Univariate(df,'target','class')
 
 
-![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/univariate.png)
+![Image text](./image/univariate.png)
 
     Plot_Scatter :  绘制一对变量的散点图
     Example:
@@ -51,7 +51,7 @@
     Plot_Scatter(df,'var1',"var2",label ='class')
 
 
-![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/scatter.png)
+![Image text](./image/scatter.png)
 
 
     支持Jupyter notebook output显示原理：
