@@ -4,6 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 import shutil
+from IPython.display import SVG,HTML
 
 #######################################################################
 ## 通用函数
@@ -27,7 +28,7 @@ def get_template(template):
         template = f.read()
     return template
 
-def creat_html(template,root,name):
+def creat_html(template,root,name,width = "900px",height = '600px'):
     ## name中的 特殊字符处理
     for i in '? * : " < > \ / |'.split(' '):
         name = name.replace(i,'')
@@ -44,15 +45,17 @@ def creat_html(template,root,name):
                 shutil.copyfile('./js/'+i,dstFilePath)    
     with open("%s/%s.html"%(root,name),"w") as  f:
         f.write(template)
+    msg = '<iframe src="%s.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(os.path.join(root,name),width,height)
+    return msg
 
 #######################################################################
 ## 时间序列的箱线图
-def box_map(root,name,alldata,xdata,lines):
+def box_map(root,name,alldata,xdata,lines,width,height):
     template = get_template('box')
     box = template%(json.dumps(alldata),json.dumps(xdata),json.dumps(lines))    
-    creat_html(box,root,name) 
+    return creat_html(box,root,name,width,height) 
       
-def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',filename = None):
+def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',name = None,width = "900px",height = '600px',show =True):
     u'''
     按照指定时间窗口绘制 时序Box图，横轴是日期，可选指定变量
     df: 类型 DataFrame
@@ -60,7 +63,10 @@ def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',filename = None):
     y: 目标变量，df[y].dtype 必须是 int或者float
     type: 时间窗口颗粒度 {date:每天 ,month:每月,year:每年} 默认每天
     root: 离线网页生成所在目录
-    filename: 离线网页文件名称
+    name: 离线网页文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
     Example:
         df = pd.DataFrame(np.random.rand(70,4),columns = ['var1','var2','var3','var4'])
         df['times'] = pd.date_range(start = '2018-01-02 00:00:00',freq = "1D",periods = len(df))
@@ -72,17 +78,21 @@ def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',filename = None):
     xdata = res.index.astype(str).tolist()
     alldata = res.values.tolist()
     lines = res.map(lambda x:np.percentile(x,50)).values.tolist()
-    if not filename:
-        filename = '%s_%s_box'%(kind,y)
-    box_map(root,filename,alldata,xdata,lines)
+    if not name:
+        name = '%s_%s_box'%(kind,y)
+    output = box_map(root,name,alldata,xdata,lines,width,height)
+    if show:
+        return HTML(output)
+    
+    
 #######################################################################
 ## 单变量散点图
-def univariate_map(root,name,alldata,column):
+def univariate_map(root,name,alldata,column,width,height):
     template = get_template('univariate')
     scatter = template%(json.dumps(alldata),json.dumps(column))
-    creat_html(scatter,root,name)
+    return creat_html(scatter,root,name,width,height)
         
-def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',reverse =False):
+def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',reverse =False,width = "900px",height = '600px',show =True):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
@@ -92,6 +102,9 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univa
     varnum: 在未指定pagenum的情况下，单页显示变量数量
     pagenum: 生成网页数量，若指定pagenum，将优先按照pagenum 进行变量分组
     root: 离线网页生成所在目录
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
     Example:
         df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
         df['class'] = ['A']*25+['B']*25
@@ -120,9 +133,27 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univa
             alldata[col] = data
         
         filename = 'Univariate_%d'%(index+1)
-        univariate_map(root,filename,alldata,column)
+        output = univariate_map(root,filename,alldata,column,width,height)
+    if show:
+        return HTML(output)
 
-def Plot_Scatter(df,x,y,root = "Scatter_analysis",name = "scatter",label =None):
+def Plot_Scatter(df,x,y,root = "Scatter_analysis",name = "scatter",label =None,width = "900px",height = '600px',show =True):
+    u'''
+    Scatter分类分析
+    绘制变量之间的简单散点关系图
+    x: 变量x ,横轴变量
+    y: 变量y ,纵轴变量
+    root: 离线网页生成所在目录
+    name: 文件名称
+    label: 类别标签
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
+        df['class'] = ['A']*25+['B']*25
+        Plot_Scatter(df,'var1',"var2",label ='class')
+    '''
     dfs = {}
     if label:
         for key in df[label].drop_duplicates():
@@ -132,13 +163,9 @@ def Plot_Scatter(df,x,y,root = "Scatter_analysis",name = "scatter",label =None):
         
     template = get_template('scatter')
     scatter = template%(json.dumps(dfs))
-    creat_html(scatter,root,name) 
-    
-if __name__ =="__main__":
-    df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
-    df['class'] = ['A']*25+['B']*25
-    Plot_Univariate(df,'target','class',root = "ts/ts")
-    
+    output = creat_html(scatter,root,name,width,height) 
+    if show:
+        return HTML(output)
     
     
     
