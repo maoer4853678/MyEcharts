@@ -1,5 +1,9 @@
 # MyEcharts
-# 基于echarts 工具开发的定制化 分析模板，js采用离线加载方式，好处是加载速度相对较快
+# 支持Jupyter notebook output 显示
+
+API 特性
+1.基于echarts 工具开发的定制化 分析模板，js采用离线加载方式，好处是加载速度相对较快
+2.每个功能函数可以在 Jupyter notebook 中output出在线网页，下面有示意图说明，功能函数中的参数 show  时表示是否显示output网页，默认显示
 
 API 目录架构
 /js
@@ -42,3 +46,11 @@ Example:
     Plot_Scatter(df,'var1',"var2",label ='class')
 ![Image text](https://github.com/maoer4853678/MyEcharts/blob/master/image/scatter.png)
 
+
+支持Jupyter notebook output显示原理：
+Jupyter notebook 中cell 类型设置为 MarkDown时 直接 引用iframe 标签 加载 外部 html时会有问题，导致页面显示不出来
+所以可以想要在 Jupyter notebook 引入外部界面，先生成html文件，然后IPython.display 中的 HTML类，实例化 html文本标记，引入iframe标签
+例如 : 
+    from IPython.display import SVG,HTML
+    example = 'iframe src="example.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'
+    HTML(example)
