@@ -56,7 +56,9 @@
 
     支持Jupyter notebook output显示原理：
     Jupyter notebook 中cell 类型设置为 MarkDown时 直接 引用iframe 标签 加载 外部 html时会有问题，导致页面显示不出来
-    所以可以想要在 Jupyter notebook 引入外部界面，先生成html文件，然后IPython.display 中的 HTML类，实例化 html文本标记，引入iframe标签
+    所以想要在 Jupyter notebook 引入外部界面，使用IPython.display 中的 HTML类 ,用HTML类来实例化 MarkDown 语言
+    
+    MyEcharts 这里显示的方式 是先生成离线html文件，引入iframe标签，用iframe导入html文件，再使用HTML类实例化html文本标记
     例如 : 
 
     from IPython.display import SVG,HTML
