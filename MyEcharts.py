@@ -28,7 +28,7 @@ def get_template(template):
         template = f.read()
     return template
 
-def creat_html(template,root,name,width = "900px",height = '600px'):
+def creat_html(template,root,name,width = "900px",height = '400px'):
     ## name中的 特殊字符处理
     for i in '? * : " < > \ / |'.split(' '):
         name = name.replace(i,'')
@@ -55,7 +55,7 @@ def box_map(root,name,alldata,xdata,lines,width,height):
     box = template%(json.dumps(alldata),json.dumps(xdata),json.dumps(lines))    
     return creat_html(box,root,name,width,height) 
       
-def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',name = None,width = "900px",height = '600px',show =True):
+def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',name = None,width = "900px",height = '400px',show =True):
     u'''
     按照指定时间窗口绘制 时序Box图，横轴是日期，可选指定变量
     df: 类型 DataFrame
@@ -92,7 +92,8 @@ def univariate_map(root,name,alldata,column,width,height):
     scatter = template%(json.dumps(alldata),json.dumps(column))
     return creat_html(scatter,root,name,width,height)
         
-def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',reverse =False,width = "900px",height = '600px',show =True):
+def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',\
+                reverse =False,width = "900px",height = '400px',show =True):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
