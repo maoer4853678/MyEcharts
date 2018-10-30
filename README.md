@@ -54,6 +54,15 @@
 ![Image text](./image/scatter.png)
 
 
+    Plot_LineBar :  绘制多变量的Line图或Bar图
+    Example:
+    from MyEcharts import Plot_LineBar
+    df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+    df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
+    Plot_LineBar(df,['var1',"var2",'var4'],kind =['line','bar','line'])
+
+![Image text](./image/linebar.png)
+
     支持Jupyter notebook output显示原理：
     Jupyter notebook 中cell 类型设置为 MarkDown时 直接 引用iframe 标签 加载 外部 html时会有问题，导致页面显示不出来
     所以想要在 Jupyter notebook 引入外部界面，使用IPython.display 中的 HTML类 ,用HTML类来实例化 MarkDown 语言
@@ -64,4 +73,5 @@
     from IPython.display import SVG,HTML
     example = 'iframe src="example.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'
     HTML(example)
+
 

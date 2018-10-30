@@ -28,7 +28,7 @@ def get_template(template):
         template = f.read()
     return template
 
-def creat_html(template,root,name,width = "900px",height = '400px'):
+def creat_html(template,root,name,width = "900px",height = '600px'):
     ## name中的 特殊字符处理
     for i in '? * : " < > \ / |'.split(' '):
         name = name.replace(i,'')
@@ -92,8 +92,7 @@ def univariate_map(root,name,alldata,column,width,height):
     scatter = template%(json.dumps(alldata),json.dumps(column))
     return creat_html(scatter,root,name,width,height)
         
-def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',\
-                reverse =False,width = "900px",height = '400px',show =True):
+def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',reverse =False,width = "900px",height = '400px',show =True):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
@@ -138,10 +137,11 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univa
     if show:
         return HTML(output)
 
-def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",width = "900px",height = '600px',show =True):
+def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",width = "900px",height = '400px',show =True):
     u'''
     Scatter分类分析
     绘制变量之间的简单散点关系图
+    df: 类型 DataFrame
     x: 变量x ,横轴变量
     y: 变量y ,纵轴变量
     root: 离线网页生成所在目录
@@ -180,4 +180,47 @@ def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",w
     
     
     
+    
+def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",name = "Linebar",width = "900px",height = '400px',show =True):
+    u'''
+    LineBar分类分析
+    绘制多变量(Number) 的Line图或Bar图，支持在线切换
+    df: 类型 DataFrame
+    columns: 要绘制的变量组，默认是None ,即df的全部字段
+    kind: 默认每个字段绘制的图类型，默认是line型,支持[],针对每个字段定义其图类型 ,
+            支持{} ,针对每个字段定义其图类型，{}的key是字段名称,value是line 或者 bar
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+        df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
+        Plot_LineBar(df,['var1',"var2",'var4'],kind =['line','bar','line'])
+    '''
+    if not columns:
+        columns = df.columns
+    if isinstance(kind,list):      
+        d = dict(zip(columns,kind))
+    elif isinstance(kind,dict):
+        d = kind
+ 
+    df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])
+    
+    for col in df1.columns:
+        if col not in d.keys():
+            d[col] = "line"
+    
+    data = {}
+    for col in df1.columns:
+        data[col] = {}
+        data[col]['kind'] = d[col]
+        data[col]['data'] = df1[col].values.tolist()
+    xaxis = df.index.astype(str).values.tolist()
+    template = get_template('linbar')
+    linbar = template%(json.dumps(data),json.dumps(xaxis))
+    output = creat_html(linbar,root,name,width,height) 
+    if show:
+        return HTML(output)
     
