@@ -21,8 +21,8 @@
         MyEcharts.py
 
 
-    ## 目前支持分析模板及对应函数 
-    
+## 目前支持分析模板及对应函数 
+
     Plot_TBox :  绘制基于时间序列的箱线图
     Example:
 
@@ -47,6 +47,7 @@
 
     Plot_Box :  绘制多变量的Box图
     Example:
+
     from MyEcharts import Plot_Box
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
     Plot_Box(df,['var1',"var2",'var4'],root = "html")
@@ -56,6 +57,7 @@
 
     Plot_Scatter :  绘制一对变量的散点图
     Example:
+
     from MyEcharts import Plot_Scatter
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
     df['class'] = ['A']*25+['B']*25
@@ -67,6 +69,7 @@
 
     Plot_LineBar :  绘制多变量的Line图或Bar图
     Example:
+
     from MyEcharts import Plot_LineBar
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
     df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
@@ -77,6 +80,7 @@
 
     Plot_Hist :  绘制多变量的hist分布图
     Example:
+
     from MyEcharts import Plot_Hist
     df = pd.DataFrame(np.random.rand(1000,4),columns = ['var1','var2','var3','var4'])
     df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
@@ -86,6 +90,7 @@
 
     Plot_3DScatter :  绘制多变量的hist分布图
     Example:
+    
     from MyEcharts import Plot_3DScatter
     df = pd.DataFrame(np.random.rand(100,3),columns = ['var1','var2','var3'])
     df['class'] = ['A']*50+['B']*50
