@@ -32,6 +32,7 @@ var itemStyle = {
     }
 };
     var alldata = %s
+    var types = %s
     var myChart = echarts.init(myChart); 
     var selectes = '';
        var option = {
@@ -59,12 +60,12 @@ var itemStyle = {
     ],
     xAxis : [
         {
-            type : 'value',
+            type :types[0],
         }
     ],
     yAxis : [
         {
-            type : 'value',
+            type : types[1],
         }
     ],
     series : [

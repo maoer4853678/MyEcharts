@@ -137,7 +137,7 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univa
     if show:
         return HTML(output)
 
-def Plot_Scatter(df,x,y,root = "Scatter_analysis",name = "scatter",label =None,width = "900px",height = '600px',show =True):
+def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",width = "900px",height = '600px',show =True):
     u'''
     Scatter分类分析
     绘制变量之间的简单散点关系图
@@ -154,17 +154,25 @@ def Plot_Scatter(df,x,y,root = "Scatter_analysis",name = "scatter",label =None,w
         df['class'] = ['A']*25+['B']*25
         Plot_Scatter(df,'var1',"var2",label ='class')
     '''
+    if label:
+        df1 =df[[x,y,label]]
+    else :
+        df1 =df[[x,y]]
+        
+    d = {"datetime64[ns]":"time"}
+    types = df1[[x,y]].dtypes.astype(str).map(d).fillna("value").values.tolist()
+    for i in range(2):
+        if types[i]=='time':
+            df1[[x,y][i]] = df1[[x,y][i]].astype(str)
     dfs = {}
     if label:
-        df =df[[x,y,label]]
-        for key in df[label].drop_duplicates():
-            dfs[str(key)] = df[df[label]==key].values.tolist()
+        for key in df1[label].drop_duplicates():
+            dfs[str(key)] = df1[df1[label]==key].values.tolist()
     else :
-        df =df[[x,y]]
-        dfs['all'] = df.values.tolist()
+        dfs['all'] = df1.values.tolist()
         
     template = get_template('scatter')
-    scatter = template%(json.dumps(dfs))
+    scatter = template%(json.dumps(dfs),json.dumps(types))
     output = creat_html(scatter,root,name,width,height) 
     if show:
         return HTML(output)
