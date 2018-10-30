@@ -92,7 +92,8 @@ def univariate_map(root,name,alldata,column,width,height):
     scatter = template%(json.dumps(alldata),json.dumps(column))
     return creat_html(scatter,root,name,width,height)
         
-def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univariate_analysis',reverse =False,width = "900px",height = '400px',show =True):
+def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
+        root='Univariate_analysis',reverse =False,width = "900px",height = '400px',show =True):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
@@ -137,7 +138,8 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,root='Univa
     if show:
         return HTML(output)
 
-def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",width = "900px",height = '400px',show =True):
+def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
+        width = "900px",height = '400px',show =True):
     u'''
     Scatter分类分析
     绘制变量之间的简单散点关系图
@@ -178,15 +180,14 @@ def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",w
     if show:
         return HTML(output)
     
-    
-    
-    
-def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",name = "Linebar",width = "900px",height = '400px',show =True):
+       
+def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",\
+        name = "Linebar",width = "900px",height = '400px',show =True):
     u'''
     LineBar分类分析
     绘制多变量(Number) 的Line图或Bar图，支持在线切换
     df: 类型 DataFrame
-    columns: 要绘制的变量组，默认是None ,即df的全部字段
+    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
     kind: 默认每个字段绘制的图类型，默认是line型,支持[],针对每个字段定义其图类型 ,
             支持{} ,针对每个字段定义其图类型，{}的key是字段名称,value是line 或者 bar
     root: 离线网页生成所在目录
@@ -230,3 +231,63 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",name 
     if show:
         return HTML(output)
     
+
+def hist_map(g,bins):
+    temp = g.values.tolist()
+    temp = g.groupby(pd.cut(g,bins= bins)).apply(len)
+    def index_map(s):
+        try:
+            t = (s.left+s.right)/2.0
+        except:
+            t = eval(s.replace("(","["))
+            t= sum(t)/float(len(t))
+        return t
+    temp.index = temp.index.map(index_map)
+    return temp.reset_index().values.tolist()
+
+def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
+        width = "900px",height = '400px',show =True):
+    u'''
+    Hist分布图
+    绘制多变量(Number) 的hist分布图
+    df: 类型 DataFrame
+    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
+    bins: 默认每个字段绘制的图类型，默认是 10,支持[],针对每个字段定义其图类型 ,
+            支持{} ,针对每个字段定义其图类型，{}的key是字段名称,value是 bins的值
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+        df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
+        Plot_Hist(df,columns = ['var1','var4'],bins = {"var4":20},root = "html")
+    '''
+    curkind = 10
+    if not columns:
+        columns = df.columns
+    if isinstance(bins,list):      
+        d = dict(zip(columns,bins))
+    elif isinstance(bins,dict):
+        d = bins
+    elif isinstance(bins,int) or isinstance(bins,float): 
+        d = {}
+        curkind = bins
+    else:
+        d = {}
+    df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])
+    
+    for col in df1.columns:
+        if col not in d.keys():
+            d[col] = curkind
+    
+    data = {}
+    for col in df1.columns:
+        data[col] = hist_map(df1[col],d[col])
+
+    template = get_template('hist')
+    linbar = template%(json.dumps(data))
+    output = creat_html(linbar,root,name,width,height) 
+    if show:
+        return HTML(output)

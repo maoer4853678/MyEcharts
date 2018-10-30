@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hist分布图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts1.min.js"></script>
+    <script src="../js/ecStat.js"></script>
+</head>
+<body onload="load()">
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:470px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+    var myChart = document.getElementById('main');
+    if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }	
+    }
+    var colorList = ['#C1232B','#B5C334','#FCCE10','#E87C25','#27727B',
+                               '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
+                               '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
+                            ];
+    var myChart = echarts.init(myChart); 
+    var alldata =  {"var4": [[0.024815999999999998, 46], [0.07515, 46], [0.125, 38], [0.175, 44], [0.225, 48], [0.275, 47], [0.32499999999999996, 49], [0.375, 60], [0.42500000000000004, 55], [0.475, 53], [0.525, 58], [0.5745, 57], [0.624, 43], [0.6739999999999999, 53], [0.724, 53], [0.774, 55], [0.8240000000000001, 51], [0.874, 37], [0.9239999999999999, 57], [0.974, 50]], "var1": [[0.049527, 99], [0.15000000000000002, 107], [0.25, 122], [0.35, 78], [0.45, 99], [0.55, 118], [0.6499999999999999, 89], [0.75, 102], [0.8495, 81], [0.9490000000000001, 105]]};
+        // 指定图表的配置项和数据
+        var option = {
+    color: ['rgb(25, 183, 207)'],
+    legend:{
+        data:[]
+    },
+    tooltip : {
+    },
+    grid: {
+        left: '3%',
+        right: '3%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: [{
+        type: 'value',
+        //这个一定要设，不然barWidth和bins对应不上
+        scale: true,
+    }],
+    yAxis: [{
+        type: 'value',
+    }],
+    series: []
+};
+		
+
+        // 使用刚指定的配置项和数据显示图表。
+        
+    function load()
+    {
+        n=0
+        legend = []
+        for (key in alldata)
+        {
+            temp = {
+                name:key,
+                data:alldata[key],
+                barWidth: '90%',
+                type: 'bar',
+                itemStyle: {
+                    normal: {
+                        color:colorList[n]
+                    }
+                },
+            }
+            option.series.push(temp)
+            legend.push(key)
+            n=n+1
+        }
+        option.legend.data = legend
+        myChart.setOption(option);
+    }
+
+    </script>
+</body>
+</html>

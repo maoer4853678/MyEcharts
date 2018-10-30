@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hist分布图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts1.min.js"></script>
+    <script src="../js/ecStat.js"></script>
+</head>
+<body onload="load()">
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:470px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+    var myChart = document.getElementById('main');
+    if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }	
+    }
+    var colorList = ['#C1232B','#B5C334','#FCCE10','#E87C25','#27727B',
+                               '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
+                               '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
+                            ];
+    var myChart = echarts.init(myChart); 
+    var alldata =  %s;
+        // 指定图表的配置项和数据
+        var option = {
+    color: ['rgb(25, 183, 207)'],
+    legend:{
+        data:[]
+    },
+    tooltip : {
+    },
+    grid: {
+        left: '3%%',
+        right: '3%%',
+        bottom: '3%%',
+        containLabel: true
+    },
+    xAxis: [{
+        type: 'value',
+        //这个一定要设，不然barWidth和bins对应不上
+        scale: true,
+    }],
+    yAxis: [{
+        type: 'value',
+    }],
+    series: []
+};
+		
+
+        // 使用刚指定的配置项和数据显示图表。
+        
+    function load()
+    {
+        n=0
+        legend = []
+        for (key in alldata)
+        {
+            temp = {
+                name:key,
+                data:alldata[key],
+                barWidth: '90%%',
+                type: 'bar',
+                itemStyle: {
+                    normal: {
+                        color:colorList[n]
+                    }
+                },
+            }
+            option.series.push(temp)
+            legend.push(key)
+            n=n+1
+        }
+        option.legend.data = legend
+        myChart.setOption(option);
+    }
+
+    </script>
+</body>
+</html>
