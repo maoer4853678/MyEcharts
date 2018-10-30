@@ -232,7 +232,7 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",\
         return HTML(output)
     
 
-def hist_map(g,bins):
+def hist_map(g,bins,scale = False):
     temp = g.values.tolist()
     temp = g.groupby(pd.cut(g,bins= bins)).apply(len)
     def index_map(s):
@@ -244,9 +244,11 @@ def hist_map(g,bins):
         return t
     temp.index.name = ''
     temp.index = temp.index.map(index_map)
+    if scale:
+        temp = temp/float(temp.max())
     return temp.reset_index().values.tolist()
 
-def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
+def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "Hist_analysis",name = "hist",\
         width = "900px",height = '400px',show =True):
     u'''
     Hist分布图
@@ -255,6 +257,7 @@ def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
     columns: 要绘制的变量组[]，默认是None ,即df的全部字段
     bins: 默认每个字段绘制的图类型，默认是 10,支持[],针对每个字段定义其图类型 ,
             支持{} ,针对每个字段定义其图类型，{}的key是字段名称,value是 bins的值
+    scale: Y轴显示归一化显示，默认False, 即按照数量显示
     root: 离线网页生成所在目录
     name: 文件名称
     width: Output 时显示宽度
@@ -263,7 +266,7 @@ def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
     Example:
         df = pd.DataFrame(np.random.rand(3000,4),columns = ['var1','var2','var3','var4'])
         df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
-        Plot_Hist(df,columns = ['var1'],bins = {"var1":100},root = "html")
+        Plot_Hist(df,columns = ['var1'],bins = {"var1":100},root = "html",scale = True)
     '''
     curkind = 10
     if not columns:
@@ -285,7 +288,7 @@ def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
     
     data = {}
     for col in df1.columns:
-        data[col] = hist_map(df1[col],d[col])
+        data[col] = hist_map(df1[col],d[col],scale)
 
     template = get_template('hist')
     hist = template%(json.dumps(data))
