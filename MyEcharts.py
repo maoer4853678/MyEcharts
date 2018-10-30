@@ -242,6 +242,7 @@ def hist_map(g,bins):
             t = eval(s.replace("(","["))
             t= sum(t)/float(len(t))
         return t
+    temp.index.name = ''
     temp.index = temp.index.map(index_map)
     return temp.reset_index().values.tolist()
 
@@ -260,9 +261,9 @@ def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
     height: Output 时显示高度
     show: 在网页中显示Output
     Example:
-        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+        df = pd.DataFrame(np.random.rand(3000,4),columns = ['var1','var2','var3','var4'])
         df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
-        Plot_Hist(df,columns = ['var1','var4'],bins = {"var4":20},root = "html")
+        Plot_Hist(df,columns = ['var1'],bins = {"var1":100},root = "html")
     '''
     curkind = 10
     if not columns:
@@ -287,7 +288,7 @@ def Plot_Hist(df,columns = None,bins = 10,root = "Hist_analysis",name = "hist",\
         data[col] = hist_map(df1[col],d[col])
 
     template = get_template('hist')
-    linbar = template%(json.dumps(data))
-    output = creat_html(linbar,root,name,width,height) 
+    hist = template%(json.dumps(data))
+    output = creat_html(hist,root,name,width,height) 
     if show:
         return HTML(output)
