@@ -199,18 +199,24 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",name 
         df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
         Plot_LineBar(df,['var1',"var2",'var4'],kind =['line','bar','line'])
     '''
+    curkind = 'line'
     if not columns:
         columns = df.columns
     if isinstance(kind,list):      
         d = dict(zip(columns,kind))
     elif isinstance(kind,dict):
         d = kind
- 
+    elif isinstance(kind,str) or isinstance(kind,unicode): 
+        d = {}
+        curkind = kind
+    else:
+        d = {}
+
     df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])
     
     for col in df1.columns:
         if col not in d.keys():
-            d[col] = "line"
+            d[col] = curkind
     
     data = {}
     for col in df1.columns:
