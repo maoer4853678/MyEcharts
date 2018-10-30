@@ -21,7 +21,8 @@
         MyEcharts.py
 
 
-    目前支持分析模板及对应函数 
+    ## 目前支持分析模板及对应函数 
+    
     Plot_TBox :  绘制基于时间序列的箱线图
     Example:
 
@@ -42,6 +43,16 @@
 
 
 ![Image text](./image/univariate.png)
+
+
+    Plot_Box :  绘制多变量的Box图
+    Example:
+    from MyEcharts import Plot_Box
+    df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+    Plot_Box(df,['var1',"var2",'var4'],root = "html")
+
+![Image text](./image/box.png)
+
 
     Plot_Scatter :  绘制一对变量的散点图
     Example:

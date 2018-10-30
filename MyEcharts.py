@@ -84,9 +84,38 @@ def Plot_TBox(df,x,y,kind='date',root='Time_series_analysis',name = None,width =
     if show:
         return HTML(output)
     
+#######################################################################
+## 箱线图
+def Plot_Box(df,columns = None,root = "Box_analysis",\
+        name = "box",width = "900px",height = '400px',show =True):
+    u'''
+    Box箱线图
+    绘制多变量(Number) 的Box图
+    df: 类型 DataFrame
+    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+        Plot_Box(df,['var1',"var2",'var4'],root = "html")
+    '''
+
+    df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])    
+    data = df1.T.values.tolist()
+    xaxis = df1.columns.astype(str).values.tolist()
+    template = get_template('box')
+    linbar = template%(json.dumps(data),json.dumps(xaxis))
+    output = creat_html(linbar,root,name,width,height) 
+    if show:
+        return HTML(output)
+        
+    
     
 #######################################################################
-## 单变量散点图
+## 多变量散点图
 def univariate_map(root,name,alldata,column,width,height):
     template = get_template('univariate')
     scatter = template%(json.dumps(alldata),json.dumps(column))
@@ -109,7 +138,7 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
     Example:
         df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
         df['class'] = ['A']*25+['B']*25
-        Plot_Univariate(df,'target','class')
+        Plot_Univariate(df,'target','class',root = "html")
     '''
     df.index = range(len(df))
     temp = df.drop([target,classf],axis =1) if classf else df.drop([target],axis =1)
@@ -138,6 +167,8 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
     if show:
         return HTML(output)
 
+#######################################################################
+## 单变量散点图
 def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
         width = "900px",height = '400px',show =True):
     u'''
@@ -155,7 +186,7 @@ def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
     Example:
         df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
         df['class'] = ['A']*25+['B']*25
-        Plot_Scatter(df,'var1',"var2",label ='class')
+        Plot_Scatter(df,'var1',"var2",label ='class',root = "html")
     '''
     if label:
         df1 =df[[x,y,label]]
@@ -180,7 +211,8 @@ def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
     if show:
         return HTML(output)
     
-       
+#######################################################################
+## 线柱图     
 def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",\
         name = "Linebar",width = "900px",height = '400px',show =True):
     u'''
@@ -198,7 +230,7 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",\
     Example:
         df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
         df.index= pd.date_range(start = '2018-01-01 00:00:00',freq = "1D",periods = len(df))
-        Plot_LineBar(df,['var1',"var2",'var4'],kind =['line','bar','line'])
+        Plot_LineBar(df,['var1',"var2",'var4'],kind =['line','bar','line'],root = "html")
     '''
     curkind = 'line'
     if not columns:
@@ -231,7 +263,8 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",\
     if show:
         return HTML(output)
     
-
+#######################################################################
+## 分布图
 def hist_map(g,bins,scale = False):
     temp = g.values.tolist()
     temp = g.groupby(pd.cut(g,bins= bins)).apply(len)
@@ -295,7 +328,10 @@ def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "Hist_analysis",n
     output = creat_html(hist,root,name,width,height) 
     if show:
         return HTML(output)
-        
+
+
+#######################################################################
+## 3D散点图        
 def Scatter3d_map(df):
     data = df.values.tolist()
     data.insert(0,df.columns.values.tolist())
