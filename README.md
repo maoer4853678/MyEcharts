@@ -22,15 +22,15 @@
 
 
     目前支持分析模板及对应函数 
-    Plot_Box :  绘制基于时间序列的箱线图
+    Plot_TBox :  绘制基于时间序列的箱线图
     Example:
 
-    from MyEcharts import Plot_Box
+    from MyEcharts import Plot_TBox
     df = pd.DataFrame(np.random.rand(70,4),columns = ['var1','var2','var3','var4'])
     df['times'] = pd.date_range(start = '2018-01-02 00:00:00',freq = "1D",periods = len(df))
-    Plot_Box(df,'times','var1',kind = 'month')
+    Plot_TBox(df,'times','var1',kind = 'month')
 
-![Image text](./image/box.png)
+![Image text](./image/tbox.png)
 
     Plot_Univariate :  绘制多个变量和目标变量的散点图
     Example:
@@ -72,6 +72,15 @@
     Plot_Hist(df,columns = ['var1','var4'],bins = {"var4":20},root = "html")
 
 ![Image text](./image/hist.png)
+
+    Plot_3DScatter :  绘制多变量的hist分布图
+    Example:
+    from MyEcharts import Plot_3DScatter
+    df = pd.DataFrame(np.random.rand(100,3),columns = ['var1','var2','var3'])
+    df['class'] = ['A']*50+['B']*50
+    Plot_3DScatter(df,'var1',"var2","var3",label ='class',root = "html")
+    
+![Image text](./image/3dscatter.png)
 
     支持Jupyter notebook output显示原理：
     Jupyter notebook 中cell 类型设置为 MarkDown时 直接 引用iframe 标签 加载 外部 html时会有问题，导致页面显示不出来

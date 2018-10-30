@@ -50,12 +50,12 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
 
 #######################################################################
 ## 时间序列的箱线图
-def box_map(root,name,alldata,xdata,lines,width,height):
-    template = get_template('box')
+def tbox_map(root,name,alldata,xdata,lines,width,height):
+    template = get_template('tbox')
     box = template%(json.dumps(alldata),json.dumps(xdata),json.dumps(lines))    
     return creat_html(box,root,name,width,height) 
       
-def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',name = None,width = "900px",height = '400px',show =True):
+def Plot_TBox(df,x,y,kind='date',root='Time_series_analysis',name = None,width = "900px",height = '400px',show =True):
     u'''
     按照指定时间窗口绘制 时序Box图，横轴是日期，可选指定变量
     df: 类型 DataFrame
@@ -70,7 +70,7 @@ def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',name = None,width = 
     Example:
         df = pd.DataFrame(np.random.rand(70,4),columns = ['var1','var2','var3','var4'])
         df['times'] = pd.date_range(start = '2018-01-02 00:00:00',freq = "1D",periods = len(df))
-        Plot_Box(df,'times','var1',kind = 'month')
+        Plot_TBox(df,'times','var1',kind = 'month',root = "html")
     '''
     df[kind] = eval('df[x].dt.%s'%kind)
     res = df.groupby(kind).apply(lambda x:x[y].values.tolist())
@@ -80,7 +80,7 @@ def Plot_Box(df,x,y,kind='date',root='Time_series_analysis',name = None,width = 
     lines = res.map(lambda x:np.percentile(x,50)).values.tolist()
     if not name:
         name = '%s_%s_box'%(kind,y)
-    output = box_map(root,name,alldata,xdata,lines,width,height)
+    output = tbox_map(root,name,alldata,xdata,lines,width,height)
     if show:
         return HTML(output)
     
@@ -146,9 +146,9 @@ def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
     df: 类型 DataFrame
     x: 变量x ,横轴变量
     y: 变量y ,纵轴变量
+    label: 类别标签
     root: 离线网页生成所在目录
     name: 文件名称
-    label: 类别标签
     width: Output 时显示宽度
     height: Output 时显示高度
     show: 在网页中显示Output
@@ -293,5 +293,54 @@ def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "Hist_analysis",n
     template = get_template('hist')
     hist = template%(json.dumps(data))
     output = creat_html(hist,root,name,width,height) 
+    if show:
+        return HTML(output)
+        
+def Scatter3d_map(df):
+    data = df.values.tolist()
+    data.insert(0,df.columns.values.tolist())
+    return data
+
+def Plot_3DScatter(df,x,y,z,label =None,root = "3DScatter_analysis",name = "3dscatter",\
+        width = "900px",height = '400px',show =True):
+    u'''
+    3DScatter分类分析
+    绘制3D散点图
+    df: 类型 DataFrame
+    x: 变量x ,X轴变量
+    y: 变量y ,Y轴变量
+    z: 变量z ,Z轴变量
+    label: 类别标签
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(100,3),columns = ['var1','var2','var3'])
+        df['class'] = ['A']*50+['B']*50
+        Plot_3DScatter(df,'var1',"var2","var3",label ='class',root = "html")
+    '''
+    if label:
+        df1 =df[[x,y,z,label]]
+    else :
+        df1 =df[[x,y,z]]
+        
+    d = {"datetime64[ns]":"time"}
+    types = df1[[x,y,z]].dtypes.astype(str).map(d).fillna("value").values.tolist()
+    for i in range(3):
+        if types[i]=='time':
+            df1[[x,y,z][i]] = df1[[x,y,z][i]].astype(str)
+    columns = dict(zip(['X','Y','Z'],[x,y,z]))
+    dfs = {}
+    if label:
+        for key in df1[label].drop_duplicates():
+            dfs[str(key)] = Scatter3d_map(df1[df1[label]==key])
+    else :
+        dfs['all'] = Scatter3d_map(df1)
+        
+    template = get_template('3dscatter')
+    scatter = template%(json.dumps(dfs),json.dumps(types),json.dumps(columns))
+    output = creat_html(scatter,root,name,width,height) 
     if show:
         return HTML(output)
