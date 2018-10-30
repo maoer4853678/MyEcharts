@@ -71,7 +71,7 @@
     例如 : 
 
     from IPython.display import SVG,HTML
-    example = 'iframe src="example.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'
+    example = '<iframe src="example.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'
     HTML(example)
 
 
