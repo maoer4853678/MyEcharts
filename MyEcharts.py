@@ -82,37 +82,7 @@ def Plot_TBox(df,x,y,kind='date',root='Time_series_analysis',name = None,width =
         name = '%s_%s_box'%(kind,y)
     output = tbox_map(root,name,alldata,xdata,lines,width,height)
     if show:
-        return HTML(output)
-    
-#######################################################################
-## 箱线图
-def Plot_Box(df,columns = None,root = "Box_analysis",\
-        name = "box",width = "900px",height = '400px',show =True):
-    u'''
-    Box箱线图
-    绘制多变量(Number) 的Box图
-    df: 类型 DataFrame
-    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
-    root: 离线网页生成所在目录
-    name: 文件名称
-    width: Output 时显示宽度
-    height: Output 时显示高度
-    show: 在网页中显示Output
-    Example:
-        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
-        Plot_Box(df,['var1',"var2",'var4'],root = "html")
-    '''
-
-    df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])    
-    data = df1.T.values.tolist()
-    xaxis = df1.columns.astype(str).values.tolist()
-    template = get_template('box')
-    linbar = template%(json.dumps(data),json.dumps(xaxis))
-    output = creat_html(linbar,root,name,width,height) 
-    if show:
-        return HTML(output)
-        
-    
+        return HTML(output)    
     
 #######################################################################
 ## 多变量散点图
@@ -167,6 +137,37 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
     if show:
         return HTML(output)
 
+#######################################################################
+## 箱线图
+def Plot_Box(df,columns = None,root = "Box_analysis",\
+        name = "box",width = "900px",height = '400px',show =True):
+    u'''
+    Box箱线图
+    绘制多变量(Number) 的Box图
+    df: 类型 DataFrame
+    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+        Plot_Box(df,['var1',"var2",'var4'],root = "html")
+    '''
+    if not columns:
+        columns = df.columns.values.tolist()
+    
+    df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])    
+    data = df1.T.values.tolist()
+    xaxis = df1.columns.astype(str).values.tolist()
+    template = get_template('box')
+    linbar = template%(json.dumps(data),json.dumps(xaxis))
+    output = creat_html(linbar,root,name,width,height) 
+    if show:
+        return HTML(output)
+        
+        
 #######################################################################
 ## 单变量散点图
 def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
@@ -329,7 +330,126 @@ def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "Hist_analysis",n
     if show:
         return HTML(output)
 
+#######################################################################
+## 箱线图
 
+def pie_axisdata(columns):
+    legend = []
+    series = []
+    if len(columns) >= 3:
+        for x,y, in [['left','10%'],['right','10'],['left','60'],['right','60']][:len(columns)]:
+            temp = '''{
+                orient: 'vertical',
+                %s: '5%%',
+                top: '%s',
+                data: []
+            }'''%(x,y)
+            legend.append(temp)
+        for x,y, in [['30%','25%'],['65%','25%'],['30%','75%'],['65%','75%']][:len(columns)]:
+            temp1 = '''{
+            name: '',
+            type: 'pie',
+            radius : '40%%',
+            center: ['%s', '%s'],
+            data:[],
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+            }'''%(x,y)
+            series.append(temp1)
+
+    elif len(columns) == 2:
+        for x,y, in [['left','10%'],['right','10']]:
+            temp = '''
+            {
+                orient: 'vertical',
+                %s: '5%%',
+                top: '%s',
+                data: []
+            }
+            '''%(x,y)
+            legend.append(temp)
+        for x,y, in [['30%','50%'],['65%','50%']]:
+            temp1 = '''{
+            name: '',
+            type: 'pie',
+            radius : '50%%',
+            center: ['%s', '%s'],
+            data:[],
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+            }'''%(x,y)
+            series.append(temp1)
+    else:
+        legend.append('''
+            {
+                orient: 'vertical',
+                left: '5%%',
+                top: '10%%',
+                data: []
+            }
+        ''')
+        series.append('''
+        {
+            name: '',
+            type: 'pie',
+            radius : '65%%',
+            center: ['50%%', '50%%'],
+            data:[],
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+        ''')
+    return legend,series
+
+def Plot_Pie(df,columns = None,top = 8,root = "Pie_analysis",\
+        name = "pie",width = "900px",height = '400px',show =True):
+    u'''
+    Box箱线图
+    绘制多变量的Pie图,最多支持4个变量同时显示
+    df: 类型 DataFrame
+    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
+    top: 每个变量中最多显示的类别个数，若变量类别多于top数量，剩余类别归为一类 ，标为 其他
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame([['A']]*25+[['B']]*35,columns = ['var1'])
+        df['var2'] = ['a','b','c','d','e','f']*5+['h']*6+['i']*20+['j']*4
+        df['var3'] = ['C']*25+['D']*30+['E']*5
+        df['var4'] = ['X']*40+['Y']*20
+        Plot_Pie(df,['var1',"var2",'var4'],top=6,root = "html")
+    '''
+    if not columns:
+        columns = df.columns.values.tolist()
+    columns = columns[:4]
+    df1 = df[columns]
+    
+    legend,series = pie_axisdata(columns)
+    
+    template = get_template('pie')
+    pie = template%(json.dumps(legend),json.dumps(series))
+    output = creat_html(pie,root,name,width,height) 
+    if show:
+        return HTML(output)
+        
+        
 #######################################################################
 ## 3D散点图        
 def Scatter3d_map(df):
