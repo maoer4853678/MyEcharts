@@ -44,9 +44,8 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
             dstFilePath = os.path.join(jspath,i)
             if not os.path.exists(dstFilePath):
                 shutil.copyfile('./js/'+i,dstFilePath) 
-    filename = "%s/%s.html"%(root,name)
-    if os.path.exists(filename):
-        filename = filename+"_"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    if os.path.exists("%s/%s.html"%(root,name)):
+        filename = "%s/%s"%(root,name)+"_"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")+".html"
     with open(filename,"w") as  f:
         f.write(template)
     msg = '<iframe src="%s.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(os.path.join(root,name),width,height)
@@ -66,7 +65,7 @@ def Plot_TBox(df,x,y,kind='date',root='html',name = None,\
     df: 类型 DataFrame
     x: 横轴时间列，df[x].dtype 必须是 datetime64[ns]
     y: 目标变量，df[y].dtype 必须是 int或者float
-    type: 时间窗口颗粒度 {date:每天 ,month:每月,year:每年} 默认每天
+    kind: 时间窗口颗粒度 {date:每天 ,month:每月,year:每年} 默认每天
     root: 离线网页生成所在目录
     name: 离线网页文件名称
     width: Output 时显示宽度
@@ -96,14 +95,14 @@ def univariate_map(root,name,alldata,column,width,height):
     scatter = template%(json.dumps(alldata),json.dumps(column))
     return creat_html(scatter,root,name,width,height)
         
-def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
+def Plot_Univariate(df,target,label=None,varnum = 10,pagenum = None,\
         root='html',reverse =False,width = "900px",height = '400px',show =True):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
     df: 类型 DataFrame
     target: 目标变量
-    classf: 可指定类别标签，若指定类别，将自动用颜色分类绘制
+    label: 可指定类别标签，若指定类别，将自动用颜色分类绘制
     varnum: 在未指定pagenum的情况下，单页显示变量数量
     pagenum: 生成网页数量，若指定pagenum，将优先按照pagenum 进行变量分组
     root: 离线网页生成所在目录
@@ -116,14 +115,14 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
         Plot_Univariate(df,'target','class',root = "html")
     '''
     df.index = range(len(df))
-    temp = df.drop([target,classf],axis =1) if classf else df.drop([target],axis =1)
+    temp = df.drop([target,label],axis =1) if label else df.drop([target],axis =1)
     all_columns = temp.columns.tolist()
     ## 根据varnum 和 pagenum 进行变量分组
     columns = siplitlist(all_columns,pagenum,0) if pagenum else siplitlist(all_columns,varnum,1)
     dfs = {}
-    if classf:
-        for key in df[classf].drop_duplicates():
-            dfs[str(key)] = df[df[classf]==key]
+    if label:
+        for key in df[label].drop_duplicates():
+            dfs[str(key)] = df[df[label]==key]
     else :
         dfs['all'] = df
     
@@ -132,12 +131,12 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
         ## column 为每页所需绘制的变量名称组
         for col in column:
             data= {}
-            for temp in dfs: ## temp 是按照classf 区分的不同组别数据
+            for temp in dfs: ## temp 是按照label 区分的不同组别数据
                 cols = [target,col] if reverse else [col,target]
                 data[temp] = dfs[temp][cols].values.tolist()
             alldata[col] = data
         
-        filename = 'Univariate_%d'%(index+1)
+        filename = 'univariate_%d'%(index+1)
         output = univariate_map(root,filename,alldata,column,width,height)
     if show:
         return HTML(output)
@@ -183,7 +182,7 @@ def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
     df: 类型 DataFrame
     x: 变量x ,横轴变量
     y: 变量y ,纵轴变量
-    label: 类别标签
+    label: 指定的类别标签，默认None 
     root: 离线网页生成所在目录
     name: 文件名称
     width: Output 时显示宽度
