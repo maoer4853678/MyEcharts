@@ -50,7 +50,7 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
         filename = "%s/%s.html"%(root,name)
     with open(filename,"w") as  f:
         f.write(template)
-    msg = '<iframe src="%s.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(filename,width,height)
+    msg = '<iframe src="%s" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(filename,width,height)
     return msg
 
 #######################################################################
