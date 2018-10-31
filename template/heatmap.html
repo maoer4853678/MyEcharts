@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>热力图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:450px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+        var myChart = document.getElementById('main');
+        if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }   
+    }
+
+    var indexs = %s
+    var columns = %s
+    var alldata = %s
+    var mm = %s
+    var myChart = echarts.init(myChart); 
+
+    var option = {
+    tooltip: {
+        position: 'top'
+    },
+    animation: false,
+    grid: {
+        height: '75%%',
+        y: '10%%'
+    },
+    dataZoom: [
+        {
+            type: 'slider',
+            xAxisIndex: 0,
+            filterMode: 'empty'
+        },
+        {
+            type: 'slider',
+            yAxisIndex: 0,
+            filterMode: 'empty'
+        },
+    ],
+    xAxis: {
+        type: 'category',
+        data: indexs,
+        splitArea: {
+            show: true
+        }
+    },
+    yAxis: {
+        type: 'category',
+        data: columns,
+        splitArea: {
+            show: true
+        }
+    },
+    visualMap: {
+        min: mm[0],
+        max: mm[1],
+        calculable: true,
+        orient: 'horizontal',
+        left: 'center',
+        bottom: '90%%'
+    },
+    series: {
+        type: 'heatmap',
+        data: alldata,
+        label: {
+            normal: {
+                show: true
+            }
+        },
+        itemStyle: {
+            emphasis: {
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+        }
+    }
+};
+        load()
+
+    function load()
+    {
+        myChart.setOption(option);
+    }
+        
+    </script>
+</body>
+</html>

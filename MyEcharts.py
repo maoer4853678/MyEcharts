@@ -219,7 +219,8 @@ def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
         return HTML(output)
     
 #######################################################################
-## 线柱图     
+## 线柱图  
+    
 def Plot_LineBar(df,columns = None,kind = "line",root = "html",\
         name = "Linebar",width = "900px",height = '400px',show =True):
     u'''
@@ -272,6 +273,7 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "html",\
     
 #######################################################################
 ## 分布图
+    
 def hist_map(g,bins,scale = False):
     temp = g.values.tolist()
     temp = g.groupby(pd.cut(g,bins= bins)).apply(len)
@@ -337,7 +339,7 @@ def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "html",name = "hi
         return HTML(output)
 
 #######################################################################
-## 箱线图
+## 饼图
 
 def pie_axisdata(columns):
     legend = []
@@ -466,8 +468,55 @@ def Plot_Pie(df,columns = None,top = 8,root = "html",\
     output = creat_html(pie,root,name,width,height) 
     if show:
         return HTML(output)
-        
-        
+
+      
+#######################################################################
+## 热力图  
+    
+def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
+    pivot_df = None,root = "html",name = "heatmap",width = "900px",\
+    height = '400px',show =True):
+    u'''
+    热力图分析
+    df: 类型 DataFrame
+    values: 热力值相关字段
+    index:  X轴字段，按其值进行分组取值
+    columns: Y轴字段，按其值进行分组取值
+    aggfunc: 配合 热力值相关字段 对经过X,Y分组后的热力相关字段作用的函数
+    pivot_df: 可以用户自行生成pivot_table , pivot_df的index即为横轴，columns即为Y轴
+        其values 即为 热力值, 默认为None, 若有赋值, 则取pivot_df 进行绘制
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        import random
+        df = pd.DataFrame(np.random.rand(1000,1),columns = ['var1'])
+        var2 = ['A','B','C','D','E']*200
+        random.shuffle (var2)
+        df['var2'] = var2
+        df['var3'] = range(20)*50
+        Plot_Heatmap(df,'var1',"var2",'var3',root = "html")
+    '''
+    if not  pivot_df:
+        pivot_df = pd.pivot_table(df,values, index ,columns , aggfunc)
+    
+    pivot_df = pivot_df.fillna(0).round(2) 
+    v = []
+    for i in range(pivot_df.shape[0]):
+        for j in range(pivot_df.shape[1]):
+            v.append([i,j,pivot_df.iloc[i,j]])
+    
+    template = get_template('heatmap')
+    linbar = template%(json.dumps(pivot_df.index.astype(str).tolist()),\
+                json.dumps(pivot_df.columns.astype(str).tolist()),
+                json.dumps(v),
+                json.dumps([pivot_df.min().min(),pivot_df.max().max()]))
+    output = creat_html(linbar,root,name,width,height) 
+    if show:
+        return HTML(output)
+     
 #######################################################################
 ## 3D散点图        
 def Scatter3d_map(df):

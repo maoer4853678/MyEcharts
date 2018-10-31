@@ -101,6 +101,20 @@
 ![Image text](./image/pie.png)
 
 
+    Plot_Heatmap :  绘制热力图，支持数据透视表功能
+    Example:
+    
+    from MyEcharts import Plot_Heatmap
+    import random
+    df = pd.DataFrame(np.random.rand(1000,1),columns = ['var1'])
+    var2 = ['A','B','C','D','E']*200
+    random.shuffle (var2)
+    df['var2'] = var2
+    df['var3'] = range(20)*50
+    Plot_Heatmap(df,'var1',"var2",'var3',root = "html")
+
+![Image text](./image/heatmap.png)
+
     Plot_3DScatter :  绘制空间三维散点图
     Example:
     
