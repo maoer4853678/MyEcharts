@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>日历热力图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:450px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+        var myChart = document.getElementById('main');
+        if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }   
+    }
+
+    var alldata = %s
+    var mm = %s
+    var myChart = echarts.init(myChart); 
+
+    var option = {
+    tooltip: {
+        position: 'top',
+        formatter: function (p) {
+            var format = echarts.format.formatTime('yyyy-MM-dd', p.data[0]);
+            return format + ': ' + p.data[1];
+        }
+    },
+    visualMap: {
+        min: mm[0],
+        max: mm[1],
+        calculable: true,
+        orient: 'horizontal',
+        left: 'center',
+        top: 'top'
+    },
+
+    calendar: [    
+    ],
+
+    series: [
+    ]
+
+};
+        load()
+
+    function load()
+    {
+        for (var i=0;i<alldata.length;i++) {
+             space = 20
+             if (i==0)
+             {
+                space = 60
+             }
+             var temp1= {
+                type: 'heatmap',
+                coordinateSystem: 'calendar',
+                calendarIndex: i,
+                data: alldata[i]['data']
+                }
+                
+             var temp2= {
+                top: i*220+space,
+                range: alldata[i]['range'],
+                cellSize: ['auto', 20]
+                }
+
+            option.series.push(temp1)
+            option.calendar.push(temp2)
+        }
+
+        myChart.setOption(option);
+    }
+        
+    </script>
+</body>
+</html>

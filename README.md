@@ -3,7 +3,8 @@
 
     API 特性
     1.基于echarts 工具开发的定制化 分析模板，js采用离线加载方式，好处是加载速度相对较快
-    2.支持Jupyter notebook 中output出在线网页，下面有示意图说明，功能函数中的参数 show  时表示是否显示output网页，默认显示
+    2.支持Jupyter notebook 中output输出在线网页，下面有示意图说明，功能函数中的参数show  
+        值为True时表示在线显示output网页
 
     API 目录架构
         /js
@@ -114,6 +115,19 @@
     Plot_Heatmap(df,'var1',"var2",'var3',root = "html")
 
 ![Image text](./image/heatmap.png)
+
+
+    Plot_Calendar : 日历热力图分析 , 日历坐标系显示热力图 ,支持自动按年分类
+    Example:
+    
+    from MyEcharts import Plot_Calendar
+    df = pd.DataFrame(np.random.rand(500,1),columns = ['var1'])
+    df['var2'] = pd.date_range('2017-02-01',periods=len(df),freq = "1D")
+    Plot_Calendar(df,values = 'var1',aggfunc = np.mean ,root = "html")
+
+![Image text](./image/calendar.png)
+
+
 
     Plot_3DScatter :  绘制空间三维散点图
     Example:

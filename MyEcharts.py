@@ -509,14 +509,73 @@ def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
             v.append([i,j,pivot_df.iloc[i,j]])
     
     template = get_template('heatmap')
-    linbar = template%(json.dumps(pivot_df.index.astype(str).tolist()),\
+    heatmap = template%(json.dumps(pivot_df.index.astype(str).tolist()),\
                 json.dumps(pivot_df.columns.astype(str).tolist()),
                 json.dumps(v),
                 json.dumps([pivot_df.min().min(),pivot_df.max().max()]))
-    output = creat_html(linbar,root,name,width,height) 
+    output = creat_html(heatmap,root,name,width,height) 
     if show:
         return HTML(output)
-     
+
+
+#######################################################################
+## 热力图  
+    
+def Plot_Calendar(df,values=None, date=None,aggfunc= sum,root = "html",\
+    name = "calendar",width = "900px",height = '400px',show =True):
+    u'''
+    日历热力图分析 , 日历坐标系显示热力图 ，支持多分类
+    df: 类型 DataFrame
+    values: 热力值相关字段
+    date:  日期字段 , datetime64[ns]型 
+    aggfunc: 配合 热力值相关字段, 经过分类字段和日期字段分组后的热力相关字段作用的函数
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(500,1),columns = ['var1'])
+        df['var2'] = pd.date_range('2017-02-01',periods=len(df),freq = "1D")
+        Plot_Calendar(df,values = 'var1',aggfunc = np.mean ,root = "html")
+    '''
+    if not  date:
+        date = df.select_dtypes(include = ["datetime64"])
+        if len(date.columns)!=0:
+            date = date.columns[0]
+        else:
+            print (u'未发现日期类型字段')
+            return
+
+    df1 = df.copy()
+    df1['&year&'] = df1[date].dt.year.astype(str)
+    
+    if not values:
+        values = date
+        aggfunc = len
+        
+    alldata= []
+    mm = []
+    for g in df1.groupby('&year&'):
+        temp = g[1]
+        data = {}
+        temp[date] = temp[date].dt.date
+        data['range'] = [str(temp[date].min()),\
+            str(temp[date].max())]
+        temp[date] = temp[date].astype(str)
+        res = temp.groupby(date).apply(aggfunc).fillna(0).round(3)
+        mm.append([res.values.min(),res.values.max()])
+        data['data'] = res.reset_index().values.tolist() 
+        alldata.append(data)
+    mm = pd.DataFrame(mm)
+    mm = [mm.min().min(),mm.max().max()]
+    template = get_template('calendar')
+    calendar = template%(json.dumps(alldata),json.dumps(mm))
+    output = creat_html(calendar,root,name,width,height) 
+    if show:
+        return HTML(output)  
+   
+   
 #######################################################################
 ## 3D散点图        
 def Scatter3d_map(df):
