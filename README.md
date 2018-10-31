@@ -98,7 +98,7 @@
     df['var4'] = ['X']*40+['Y']*20
     Plot_Pie(df,['var1','var4'],top=6,root = "html")
 
-![Image text](./image/hist.png)
+![Image text](./image/pie.png)
 
 
     Plot_3DScatter :  绘制空间三维散点图
