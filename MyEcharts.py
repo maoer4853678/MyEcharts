@@ -524,7 +524,7 @@ def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
 def Plot_Calendar(df,values=None, date=None,aggfunc= sum,root = "html",\
     name = "calendar",width = "900px",height = '400px',show =True):
     u'''
-    日历热力图分析 , 日历坐标系显示热力图 ，支持多分类
+    日历热力图分析 , 日历坐标系显示热力图 ,支持自动按年分类
     df: 类型 DataFrame
     values: 热力值相关字段
     date:  日期字段 , datetime64[ns]型 
