@@ -4,6 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 import shutil
+import datetime
 from IPython.display import SVG,HTML
 
 #######################################################################
@@ -42,8 +43,11 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
         for i in os.listdir('./js'):
             dstFilePath = os.path.join(jspath,i)
             if not os.path.exists(dstFilePath):
-                shutil.copyfile('./js/'+i,dstFilePath)    
-    with open("%s/%s.html"%(root,name),"w") as  f:
+                shutil.copyfile('./js/'+i,dstFilePath) 
+    filename = "%s/%s.html"%(root,name)
+    if os.path.exists(filename):
+        filename = filename+"_"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    with open(filename,"w") as  f:
         f.write(template)
     msg = '<iframe src="%s.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(os.path.join(root,name),width,height)
     return msg
@@ -55,7 +59,8 @@ def tbox_map(root,name,alldata,xdata,lines,width,height):
     box = template%(json.dumps(alldata),json.dumps(xdata),json.dumps(lines))    
     return creat_html(box,root,name,width,height) 
       
-def Plot_TBox(df,x,y,kind='date',root='Time_series_analysis',name = None,width = "900px",height = '400px',show =True):
+def Plot_TBox(df,x,y,kind='date',root='html',name = None,\
+        width = "900px",height = '400px',show =True):
     u'''
     按照指定时间窗口绘制 时序Box图，横轴是日期，可选指定变量
     df: 类型 DataFrame
@@ -92,7 +97,7 @@ def univariate_map(root,name,alldata,column,width,height):
     return creat_html(scatter,root,name,width,height)
         
 def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
-        root='Univariate_analysis',reverse =False,width = "900px",height = '400px',show =True):
+        root='html',reverse =False,width = "900px",height = '400px',show =True):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
@@ -139,7 +144,7 @@ def Plot_Univariate(df,target,classf=None,varnum = 10,pagenum = None,\
 
 #######################################################################
 ## 箱线图
-def Plot_Box(df,columns = None,root = "Box_analysis",\
+def Plot_Box(df,columns = None,root = "html",\
         name = "box",width = "900px",height = '400px',show =True):
     u'''
     Box箱线图
@@ -170,7 +175,7 @@ def Plot_Box(df,columns = None,root = "Box_analysis",\
         
 #######################################################################
 ## 单变量散点图
-def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
+def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
         width = "900px",height = '400px',show =True):
     u'''
     Scatter分类分析
@@ -214,7 +219,7 @@ def Plot_Scatter(df,x,y,label =None,root = "Scatter_analysis",name = "scatter",\
     
 #######################################################################
 ## 线柱图     
-def Plot_LineBar(df,columns = None,kind = "line",root = "LineBar_analysis",\
+def Plot_LineBar(df,columns = None,kind = "line",root = "html",\
         name = "Linebar",width = "900px",height = '400px',show =True):
     u'''
     LineBar分类分析
@@ -282,7 +287,7 @@ def hist_map(g,bins,scale = False):
         temp = temp/float(temp.max())
     return temp.reset_index().values.tolist()
 
-def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "Hist_analysis",name = "hist",\
+def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "html",name = "hist",\
         width = "900px",height = '400px',show =True):
     u'''
     Hist分布图
@@ -428,10 +433,9 @@ def pie_map(g,top):
     series = temp.T.to_dict().values()
     return {"legend":legend,"series":series}
 
-def Plot_Pie(df,columns = None,top = 8,root = "Pie_analysis",\
+def Plot_Pie(df,columns = None,top = 8,root = "html",\
         name = "pie",width = "900px",height = '400px',show =True):
     u'''
-    Box箱线图
     绘制多变量的Pie图,最多支持4个变量同时显示,支持自动布局
     df: 类型 DataFrame
     columns: 要绘制的变量组[]，默认是None ,即df的全部字段
@@ -470,7 +474,7 @@ def Scatter3d_map(df):
     data.insert(0,df.columns.values.tolist())
     return data
 
-def Plot_3DScatter(df,x,y,z,label =None,root = "3DScatter_analysis",name = "3dscatter",\
+def Plot_3DScatter(df,x,y,z,label =None,root = "html",name = "3dscatter",\
         width = "900px",height = '400px',show =True):
     u'''
     3DScatter分类分析
