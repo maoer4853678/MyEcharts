@@ -25,27 +25,87 @@
     }
 
     var myChart = echarts.init(myChart); 
-    var legend = ["{\n                orient: 'vertical',\n                left: '5%',\n                top: '10%',\n                data: []\n            }", "{\n                orient: 'vertical',\n                right: '5%',\n                top: '10',\n                data: []\n            }", "{\n                orient: 'vertical',\n                left: '5%',\n                top: '60',\n                data: []\n            }"]
-    var series = ["{\n            name: '',\n            type: 'pie',\n            radius : '40%',\n            center: ['30%', '25%'],\n            data:[],\n            itemStyle: {\n                emphasis: {\n                    shadowBlur: 10,\n                    shadowOffsetX: 0,\n                    shadowColor: 'rgba(0, 0, 0, 0.5)'\n                }\n            }\n            }", "{\n            name: '',\n            type: 'pie',\n            radius : '40%',\n            center: ['65%', '25%'],\n            data:[],\n            itemStyle: {\n                emphasis: {\n                    shadowBlur: 10,\n                    shadowOffsetX: 0,\n                    shadowColor: 'rgba(0, 0, 0, 0.5)'\n                }\n            }\n            }", "{\n            name: '',\n            type: 'pie',\n            radius : '40%',\n            center: ['30%', '75%'],\n            data:[],\n            itemStyle: {\n                emphasis: {\n                    shadowBlur: 10,\n                    shadowOffsetX: 0,\n                    shadowColor: 'rgba(0, 0, 0, 0.5)'\n                }\n            }\n            }"]
+    var alldata  =[{"series": [{"name": "B", "value": 35}, {"name": "A", "value": 25}], "legend": ["B", "A"]}, {"series": [{"name": "X", "value": 40}, {"name": "Y", "value": 20}], "legend": ["X", "Y"]}]
+    var legend = [
+            {
+                orient: 'vertical',
+                left: '5%',
+                top: '10%',
+                data: []
+            }
+            ,
+
+            {
+                orient: 'vertical',
+                right: '5%',
+                top: '10%',
+                data: []
+            }
+            ]
+    var series = [{
+            name: '',
+            type: 'pie',
+            radius : '50%',
+            center: ['30%', '50%'],
+            data:[],
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+            },
+{
+            name: '',
+            type: 'pie',
+            radius : '50%',
+            center: ['65%', '50%'],
+            data:[],
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+            }]
     
-option = {
+var option = {
     title : {
         text: '饼图',
         x:'center'
     },
+    toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
     tooltip : {
         trigger: 'item',
         formatter: "{a} <br/>{b} : {c} ({d}%)"
     },
-    legend: [
-    ],
-    series : [
-
-    ]
+    legend: legend,
+    series : series
 };
 
-		myChart.setOption(option);
-        
+load()
+
+function load()
+{
+    for (var i=0;i<option.series.length;i++) {
+
+            option.series[i].data = alldata[i]['series']
+            option.legend[i].data = alldata[i]['legend']
+        }
+
+    myChart.setOption(option);
+}
+
     </script>
 </body>
 </html>

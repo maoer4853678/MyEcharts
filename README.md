@@ -23,7 +23,7 @@
 
 ## 目前支持分析模板及对应函数 
 
-    Plot_TBox :  绘制基于时间序列的箱线图
+    Plot_TBox :  绘制基于时间序列的箱线图 ，支持时间窗口包括 年，月，日，时，分，秒，周
     Example:
 
     from MyEcharts import Plot_TBox
@@ -33,14 +33,14 @@
 
 ![Image text](./image/tbox.png)
 
-    Plot_Univariate :  绘制多个变量和目标变量的散点图
+
+    Plot_Univariate :  绘制多个变量和目标变量的散点图 ，支持在线切换变量
     Example:
 
     from MyEcharts import Plot_Univariate
     df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
     df['class'] = ['A']*25+['B']*25
     Plot_Univariate(df,'target','class')
-
 
 ![Image text](./image/univariate.png)
 
@@ -63,11 +63,10 @@
     df['class'] = ['A']*25+['B']*25
     Plot_Scatter(df,'var1',"var2",label ='class')
 
-
 ![Image text](./image/scatter.png)
 
 
-    Plot_LineBar :  绘制多变量的Line图或Bar图
+    Plot_LineBar :  绘制多变量的Line图或Bar图，支持在线切换图类型
     Example:
 
     from MyEcharts import Plot_LineBar
@@ -88,7 +87,21 @@
 
 ![Image text](./image/hist.png)
 
-    Plot_3DScatter :  绘制多变量的hist分布图
+
+    Plot_Pie :  绘制多变量的Pie图,最多支持4个变量同时显示,支持自动布局
+    Example:
+    
+    from MyEcharts import Plot_Pie
+    df = pd.DataFrame([['A']]*25+[['B']]*35,columns = ['var1'])
+    df['var2'] = ['a','b','c','d','e','f']*5+['h']*6+['i']*20+['j']*4
+    df['var3'] = ['C']*25+['D']*30+['E']*5
+    df['var4'] = ['X']*40+['Y']*20
+    Plot_Pie(df,['var1','var4'],top=6,root = "html")
+
+![Image text](./image/hist.png)
+
+
+    Plot_3DScatter :  绘制空间三维散点图
     Example:
     
     from MyEcharts import Plot_3DScatter
@@ -97,6 +110,7 @@
     Plot_3DScatter(df,'var1',"var2","var3",label ='class',root = "html")
     
 ![Image text](./image/3dscatter.png)
+
 
     支持Jupyter notebook output显示原理：
     Jupyter notebook 中cell 类型设置为 MarkDown时 直接 引用iframe 标签 加载 外部 html时会有问题，导致页面显示不出来

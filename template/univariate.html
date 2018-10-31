@@ -34,7 +34,7 @@ option = {
     title: [
         {
             text: '',
-            left: 'right',
+            left: 'left',
         }
     ],
     tooltip: {
@@ -43,6 +43,15 @@ option = {
             type: 'shadow'
         }
     },
+    toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
     legend:
     {
         data:[]

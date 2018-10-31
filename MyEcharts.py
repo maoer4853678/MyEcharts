@@ -337,7 +337,7 @@ def pie_axisdata(columns):
     legend = []
     series = []
     if len(columns) >= 3:
-        for x,y, in [['left','10%'],['right','10'],['left','60'],['right','60']][:len(columns)]:
+        for x,y, in [['left','10%'],['right','10%'],['left','60%'],['right','60%']][:len(columns)]:
             temp = '''{
                 orient: 'vertical',
                 %s: '5%%',
@@ -363,7 +363,7 @@ def pie_axisdata(columns):
             series.append(temp1)
 
     elif len(columns) == 2:
-        for x,y, in [['left','10%'],['right','10']]:
+        for x,y, in [['left','10%'],['right','10%']]:
             temp = '''
             {
                 orient: 'vertical',
@@ -414,13 +414,25 @@ def pie_axisdata(columns):
             }
         }
         ''')
-    return legend,series
+    return "[%s]"%(',\n'.join(legend)),"[%s]"%(',\n'.join(series))
+
+def pie_map(g,top):
+    temp = g.value_counts()
+    other = temp.iloc[top-1:].sum()
+    temp =temp.iloc[:top-1]
+    if other!=0:
+        temp.loc['Other'] = other
+    legend =temp.index.values.tolist()
+    temp = temp.to_frame().reset_index()
+    temp.columns = ['name','value']
+    series = temp.T.to_dict().values()
+    return {"legend":legend,"series":series}
 
 def Plot_Pie(df,columns = None,top = 8,root = "Pie_analysis",\
         name = "pie",width = "900px",height = '400px',show =True):
     u'''
     Box箱线图
-    绘制多变量的Pie图,最多支持4个变量同时显示
+    绘制多变量的Pie图,最多支持4个变量同时显示,支持自动布局
     df: 类型 DataFrame
     columns: 要绘制的变量组[]，默认是None ,即df的全部字段
     top: 每个变量中最多显示的类别个数，若变量类别多于top数量，剩余类别归为一类 ，标为 其他
@@ -434,17 +446,18 @@ def Plot_Pie(df,columns = None,top = 8,root = "Pie_analysis",\
         df['var2'] = ['a','b','c','d','e','f']*5+['h']*6+['i']*20+['j']*4
         df['var3'] = ['C']*25+['D']*30+['E']*5
         df['var4'] = ['X']*40+['Y']*20
-        Plot_Pie(df,['var1',"var2",'var4'],top=6,root = "html")
+        Plot_Pie(df,['var1','var4'],top=6,root = "html")
     '''
     if not columns:
         columns = df.columns.values.tolist()
     columns = columns[:4]
     df1 = df[columns]
-    
+    alldata = []
+    for col in df1.columns:
+        alldata.append(pie_map(df1[col],top))   
     legend,series = pie_axisdata(columns)
-    
     template = get_template('pie')
-    pie = template%(json.dumps(legend),json.dumps(series))
+    pie = template%(json.dumps(alldata),legend,series)
     output = creat_html(pie,root,name,width,height) 
     if show:
         return HTML(output)

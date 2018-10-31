@@ -40,6 +40,15 @@ var itemStyle = {
 
     var symbolSize = 5;
     option = {
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
         grid3D: {},
         xAxis3D: {
             type: types[0]
