@@ -46,9 +46,11 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
                 shutil.copyfile('./js/'+i,dstFilePath) 
     if os.path.exists("%s/%s.html"%(root,name)):
         filename = "%s/%s"%(root,name)+"_"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")+".html"
+    else:
+        filename = "%s/%s.html"%(root,name)
     with open(filename,"w") as  f:
         f.write(template)
-    msg = '<iframe src="%s.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(os.path.join(root,name),width,height)
+    msg = '<iframe src="%s.html" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(filename,width,height)
     return msg
 
 #######################################################################
