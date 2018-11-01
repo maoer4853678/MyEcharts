@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>3D柱状图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts.min.js"></script>
+    <script src="../js/echarts-gl.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:450px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+        var myChart = document.getElementById('main');
+        if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }   
+    }
+
+    
+    var index = %s
+	var columns = %s
+	var alldata = %s
+	var mm = %s
+
+	var myChart = echarts.init(myChart); 
+
+var option = {
+    tooltip: {},
+    visualMap: [{
+    	min: mm['X'][0],
+        max: mm['X'][1],
+        inRange: {
+            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        },
+        dimension:0,
+        calculable: true,
+        left: 'left',
+        bottom: '55%%',
+    },
+    {
+    	min:mm['Y'][0],
+        max: mm['Y'][1],
+        inRange: {
+            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        },
+        dimension:1,
+        calculable: true,
+        left: 'left',
+        bottom: '10%%',
+    },
+    {
+        min:mm['Z'][0],
+        max:mm['Z'][1],
+        inRange: {
+            color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        },
+        dimension:2,
+        calculable: true,
+        left: 'right',
+        bottom: '55%%',
+    },
+    ],
+    xAxis3D: {
+        type: 'category',
+        data: index
+    },
+    yAxis3D: {
+        type: 'category',
+        data: columns
+    },
+    zAxis3D: {
+        type: 'value'
+    },
+    grid3D: {
+        boxWidth: 200,
+        boxDepth: 80,
+        viewControl: {
+        },
+        light: {
+            main: {
+                intensity: 1.2,
+                shadow: true
+            },
+            ambient: {
+                intensity: 0.3
+            }
+        }
+    },
+    series: [{
+        type: 'bar3D',
+        data: alldata,
+        shading: 'lambert',
+
+        label: {
+            textStyle: {
+                fontSize: 16,
+                borderWidth: 1
+            }
+        },
+
+        emphasis: {
+            label: {
+                textStyle: {
+                    fontSize: 20,
+                    color: '#900'
+                }
+            },
+            itemStyle: {
+                color: '#900'
+            }
+        }
+    }]
+}
+ myChart.setOption(option);
+        
+    </script>
+</body>
+</html>

@@ -85,9 +85,8 @@ function load()
             min:mm['X'][0],
             max:mm['X'][1],
             calculable: true,
-            orient: 'horizontal',
-            left: '20%%',
-            bottom: '85%%',
+            left: 'left',
+            bottom: '55%%',
             },
         {
             text:["Ymax","Ymin"],
@@ -95,7 +94,8 @@ function load()
             min:mm['Y'][0],
             max:mm['Y'][1],
             calculable: true,
-            bottom: '50%%',
+            left: 'left',
+            bottom: '10%%',
         },
         {
             text:["Zmax","Zmin"],
@@ -104,7 +104,7 @@ function load()
             max:mm['Z'][1],
             calculable: true,
             left: 'right',
-            bottom: '50%%',
+            bottom: '55%%',
 
         }]
         if (visual==1)
@@ -117,10 +117,9 @@ function load()
 	            dimension:columns['T'],
 	            min:mm['T'][0],
 	            max:mm['T'][1],
-	            orient: 'horizontal',
 	            calculable: true,
-	            left: '65%%',
-	            bottom: '85%%',
+	            left: 'right',
+	            bottom: '10%%',
 	            }
 	            option.visualMap.push(temp)
 	        }

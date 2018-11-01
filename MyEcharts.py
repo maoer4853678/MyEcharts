@@ -607,7 +607,7 @@ def Plot_3DScatter(df,x,y,z,label =None,other = None,visualmap=True,root = "html
         df['var4'] = df['var4']*50
         df['class'] = ['A']*50+['B']*50
         Plot_3DScatter(df,'var1',"var2","var3",label ='class',\
-            visualmap=False,other="var4",root = "html")
+            visualmap=True,other="var4",root = "html")
     '''
     if label:
         df1 =df[[x,y,z,label]]
@@ -640,5 +640,58 @@ def Plot_3DScatter(df,x,y,z,label =None,other = None,visualmap=True,root = "html
     scatter = template%(json.dumps(dfs),json.dumps(types),\
         json.dumps(columns),other,json.dumps(mm),str(visualmap*1))
     output = creat_html(scatter,root,name,width,height) 
+    if show:
+        return HTML(output)
+        
+   
+#######################################################################
+## 3D柱状图    
+        
+def Plot_3DBar(df,values=None, index=None, columns=None ,aggfunc= sum,\
+    pivot_df = None,root = "html",name = "3dbar",width = "900px",\
+    height = '400px',show =True):
+    u'''
+    3D柱状图分析
+    df: 类型 DataFrame
+    values: Z轴字段
+    index:  X轴字段，按其值进行分组取值
+    columns: Y轴字段，按其值进行分组取值
+    aggfunc: 配合 热力值相关字段 对经过X,Y分组后的Z轴字段作用的函数
+    pivot_df: 可以用户自行生成pivot_table , pivot_df的index即为横轴，columns即为Y轴
+        其values 即为 热力值, 默认为None, 若有赋值, 则取pivot_df 进行绘制
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        import random
+        df = pd.DataFrame(np.random.rand(1000,1),columns = ['var1'])
+        var2 = range(40)*25
+        random.shuffle(var2)
+        df['var2'] = var2
+        df['var3'] = range(20)*50
+        Plot_3DBar(df,'var1',"var2",'var3',root = "html")
+    '''
+    if not  pivot_df:
+        pivot_df = pd.pivot_table(df,values, index ,columns , aggfunc)
+    
+    pivot_df = pivot_df.fillna(0).round(2) 
+    v = []
+    for i in range(pivot_df.shape[0]):
+        for j in range(pivot_df.shape[1]):
+            v.append([i,j,pivot_df.iloc[i,j]])
+    
+    mm = {}
+    mm['X'] = [0,pivot_df.shape[0]]
+    mm['Y'] = [0,pivot_df.shape[0]]
+    mm['Z']  = [pivot_df.min().min(),pivot_df.max().max()]
+    
+    template = get_template('3dbar')
+    bar = template%(json.dumps(pivot_df.index.astype(str).tolist()),\
+                json.dumps(pivot_df.columns.astype(str).tolist()),
+                json.dumps(v),
+                json.dumps(mm))
+    output = creat_html(bar,root,name,width,height) 
     if show:
         return HTML(output)

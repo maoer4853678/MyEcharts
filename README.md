@@ -143,6 +143,20 @@
 ![Image text](./image/3dscatter.png)
 
 
+    Plot_3DBar :  绘制空间三维柱状图
+    Example:
+    
+    from MyEcharts import Plot_3DBar
+    import random
+    df = pd.DataFrame(np.random.rand(1000,1),columns = ['var1'])
+    var2 = range(40)*25
+    random.shuffle(var2)
+    df['var2'] = var2
+    df['var3'] = range(20)*50
+    Plot_3DBar(df,'var1',"var2",'var3',root = "html")
+    
+![Image text](./image/3dbar.png)
+
     支持Jupyter notebook output显示原理：
     Jupyter notebook 中cell 类型设置为 MarkDown时 直接 引用iframe 标签 加载 外部 html时会有问题，导致页面显示不出来
     所以想要在 Jupyter notebook 引入外部界面，使用IPython.display 中的 HTML类 ,用HTML类来实例化 MarkDown 语言
