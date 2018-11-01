@@ -133,9 +133,12 @@
     Example:
     
     from MyEcharts import Plot_3DScatter
-    df = pd.DataFrame(np.random.rand(100,3),columns = ['var1','var2','var3'])
+    df = pd.DataFrame(np.random.rand(100,4),columns = ['var1','var2','var3',"var4"])
+    df['var1'] = df['var1']*10
+    df['var2'] = df['var2']*20
+    df['var4'] = df['var4']*50
     df['class'] = ['A']*50+['B']*50
-    Plot_3DScatter(df,'var1',"var2","var3",label ='class',root = "html")
+    Plot_3DScatter(df,'var1',"var2","var3",label ='class',other="var4",root = "html")
     
 ![Image text](./image/3dscatter.png)
 

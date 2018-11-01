@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>3D散点图</title>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts.min.js"></script>
+    <script src="../js/echarts-gl.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1500px;height:450px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+
+        var myChart = document.getElementById('main');
+        if (window.innerWidth>50) 
+    {
+        if (window.innerHeight>50) 
+        {
+            myChart.style.width = window.innerWidth-30+'px';
+            myChart.style.height = window.innerHeight-30+'px';
+        }   
+    }
+             
+var itemStyle = {
+    normal: {
+        opacity: 0.8,
+        shadowBlur: 10,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        shadowColor: 'rgba(0, 0, 0, 0.5)'
+    }
+};
+    var alldata = %s
+    var types = %s
+    var columns = %s
+    var other = '%s'
+    var mm = %s
+    var colorList = [
+                          '#C1232B','#B5C334','#FCCE10','#E87C25','#27727B',
+                           '#FE8463','#9BCA63','#FAD860','#F3A43B','#60C0DD',
+                           '#D7504B','#C6E579','#F4E001','#F0805A','#26C0C0'
+                        ];
+    var myChart = echarts.init(myChart); 
+
+    var symbolSize = 5;
+    option = {
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        visualMap: [{
+            text:["Xmax","Xmin"],
+            dimension:0,
+            min:mm['X'][0],
+            max:mm['X'][1],
+            calculable: true,
+            orient: 'horizontal',
+            left: '20%%',
+            bottom: '85%%',
+            },
+        {
+            text:["Ymax","Ymin"],
+            dimension:1,
+            min:mm['Y'][0],
+            max:mm['Y'][1],
+            calculable: true,
+            bottom: '50%%',
+        },
+        {
+            text:["Zmax","Zmin"],
+            dimension:2,
+            min:mm['Z'][0],
+            max:mm['Z'][1],
+            calculable: true,
+            left: 'right',
+            bottom: '50%%',
+
+        }
+        ],
+        grid3D: {},
+        xAxis3D: {
+            type: types[0]
+        },
+        legend:{data:[]},
+        yAxis3D: {
+            type: types[1]
+        },
+        zAxis3D: {
+            type: types[2]
+        },
+        dataset: [],
+        series: [
+        ]
+    };
+    
+     load()
+
+function load()
+    {
+        if (other!='')
+        {
+            temp = {
+            text:[other+"_max",other+"_min"],
+            dimension:columns['T'],
+            min:mm['T'][0],
+            max:mm['T'][1],
+            orient: 'horizontal',
+            calculable: true,
+            left: '65%%',
+            bottom: '85%%',
+            }
+            option.visualMap.push(temp)
+        }
+        n=0
+        legend = []
+        for (key in alldata)
+        {
+            data = {
+                    source: alldata[key]
+                }
+
+            temp = {   
+                name:key,
+                type: 'scatter3D',
+                symbolSize: symbolSize,
+                encode: {
+                    x: columns['X'],
+                    y: columns['Y'],
+                    z: columns['Z'],
+                    tooltip: [0, 1, 2, 3,4]
+                },
+                datasetIndex :n,
+            }
+            option.dataset.push(data)
+            option.series.push(temp)
+            legend.push(key)
+        n=n+1
+        }
+        option.legend.data = legend
+        myChart.setOption(option);
+    }
+
+    </script>
+</body>
+</html>

@@ -583,7 +583,7 @@ def Scatter3d_map(df):
     data.insert(0,df.columns.values.tolist())
     return data
 
-def Plot_3DScatter(df,x,y,z,label =None,root = "html",name = "3dscatter",\
+def Plot_3DScatter(df,x,y,z,label =None,other = None,root = "html",name = "3dscatter",\
         width = "900px",height = '400px',show =True):
     u'''
     3DScatter分类分析
@@ -593,15 +593,19 @@ def Plot_3DScatter(df,x,y,z,label =None,root = "html",name = "3dscatter",\
     y: 变量y ,Y轴变量
     z: 变量z ,Z轴变量
     label: 类别标签
+    other: 其他变量，用于zoom
     root: 离线网页生成所在目录
     name: 文件名称
     width: Output 时显示宽度
     height: Output 时显示高度
     show: 在网页中显示Output
     Example:
-        df = pd.DataFrame(np.random.rand(100,3),columns = ['var1','var2','var3'])
+        df = pd.DataFrame(np.random.rand(100,4),columns = ['var1','var2','var3',"var4"])
+        df['var1'] = df['var1']*10
+        df['var2'] = df['var2']*20
+        df['var4'] = df['var4']*50
         df['class'] = ['A']*50+['B']*50
-        Plot_3DScatter(df,'var1',"var2","var3",label ='class',root = "html")
+        Plot_3DScatter(df,'var1',"var2","var3",label ='class',other="var4",root = "html")
     '''
     if label:
         df1 =df[[x,y,z,label]]
@@ -613,7 +617,16 @@ def Plot_3DScatter(df,x,y,z,label =None,root = "html",name = "3dscatter",\
     for i in range(3):
         if types[i]=='time':
             df1[[x,y,z][i]] = df1[[x,y,z][i]].astype(str)
-    columns = dict(zip(['X','Y','Z'],[x,y,z]))
+    columns = dict(zip(['X','Y','Z'],[x,y,z]))  
+    mm = {}
+    for key,col in [['X',x],['Y',y],['Z',z]]:
+        mm[key] = [df[col].min(),df[col].max()]
+    if other :
+        columns['T'] = other
+        df1[other] = df[other]
+        mm['T'] = [df[other].min(),df[other].max()]
+    else:
+        other = ""
     dfs = {}
     if label:
         for key in df1[label].drop_duplicates():
@@ -621,8 +634,9 @@ def Plot_3DScatter(df,x,y,z,label =None,root = "html",name = "3dscatter",\
     else :
         dfs['all'] = Scatter3d_map(df1)
         
-    template = get_template('3dscatter')
-    scatter = template%(json.dumps(dfs),json.dumps(types),json.dumps(columns))
+    template = get_template('3dscatter1')
+    scatter = template%(json.dumps(dfs),json.dumps(types),\
+        json.dumps(columns),other,json.dumps(mm))
     output = creat_html(scatter,root,name,width,height) 
     if show:
         return HTML(output)
