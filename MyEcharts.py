@@ -78,8 +78,9 @@ def Plot_TBox(df,x,y,kind='date',root='html',name = None,\
         df['times'] = pd.date_range(start = '2018-01-02 00:00:00',freq = "1D",periods = len(df))
         Plot_TBox(df,'times','var1',kind = 'month',root = "html")
     '''
-    df[kind] = eval('df[x].dt.%s'%kind)
-    res = df.groupby(kind).apply(lambda x:x[y].values.tolist())
+    df1 = df[[x,y]]
+    df1[kind] = eval('df1[x].dt.%s'%kind)
+    res = df1.groupby(kind).apply(lambda x:x[y].values.tolist())
     res =res.sort_index()
     xdata = res.index.astype(str).tolist()
     alldata = res.values.tolist()
