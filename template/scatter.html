@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>多变量散点图</title>
     <!-- 引入 echarts.js -->
-    <script src="../js/echarts.min.js"></script>
+    <script src="../js/echarts.js"></script>
 </head>
 <body>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
@@ -33,6 +33,7 @@ var itemStyle = {
 };
     var alldata = %s
     var types = %s
+    var marklines = %s
     var myChart = echarts.init(myChart); 
     var selectes = '';
        var option = {
@@ -91,15 +92,37 @@ var itemStyle = {
 
     function load()
     {
+
     	legend = []
         for (key in alldata)
         {
-        	temp = {
+            
+          	temp = {
                 name:key,
 		        symbolSize: 5,
 		        data:alldata[key],
-		        type: 'scatter'
+		        type: 'scatter',
+                markLine:{
+                    symbol:"none",
+                    data:[],
+                    lineStyle :{
+                        type:"solid",
+                        color:''}
+                    }
 		    }
+
+            if (key in marklines)
+            {
+                markline = marklines[key]
+                lines = []
+                for (var i=0;i<markline['data'].length;i++) 
+                {
+                    lines.push({xAxis:markline['data'][i]})
+                }
+                temp.markLine.data = lines
+                temp.markLine.lineStyle.color = markline['color']
+            }
+
         	option.series.push(temp)
         	legend.push(key)
         }

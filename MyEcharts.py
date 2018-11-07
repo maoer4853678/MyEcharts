@@ -177,7 +177,7 @@ def Plot_Box(df,columns = None,root = "html",\
         
 #######################################################################
 ## 单变量散点图
-def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
+def Plot_Scatter(df,x,y,label =None,markline ={},root = "html",name = "scatter",\
         width = "900px",height = '400px',show =True):
     u'''
     Scatter分类分析
@@ -186,6 +186,7 @@ def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
     x: 变量x ,横轴变量
     y: 变量y ,纵轴变量
     label: 指定的类别标签，默认None 
+    markline: 辅助线设置，{} 可以按照类别绘制辅助线,若为[],所有参数统一设置，颜色默认红色
     root: 离线网页生成所在目录
     name: 文件名称
     width: Output 时显示宽度
@@ -194,7 +195,9 @@ def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
     Example:
         df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','target'])
         df['class'] = ['A']*25+['B']*25
-        Plot_Scatter(df,'var1',"var2",label ='class',root = "html")
+        df['time'] = pd.date_range("2018-08-01",freq = "1D",periods=len(df))
+        Plot_Scatter(df,'time',"var2",label ='class',markline = {"A":['2018-08-03'],\
+            "B":{"data":['2018-08-09',"2018-08-15"],'color':"grey"}},root = "html")
     '''
     if label:
         df1 =df[[x,y,label]]
@@ -213,8 +216,26 @@ def Plot_Scatter(df,x,y,label =None,root = "html",name = "scatter",\
     else :
         dfs['all'] = df1.values.tolist()
         
+    marklines = {}
+    if len(markline)!=0:
+        if isinstance(markline,list):
+            for key in dfs:
+                marklines[key] = {"data":markline,"color":"red"}
+        elif isinstance(markline,dict):
+            for key in markline:
+                marklines[key] = {'data':[],'color':'red'}
+                if isinstance(markline[key],list):
+                    marklines[key]["data"]=markline[key]
+                elif isinstance(markline[key],dict):
+                    if "data" in markline[key]:
+                        marklines[key]["data"] =markline[key]['data']
+                    if "color" in markline[key]:
+                        marklines[key]["color"] =markline[key]['color']
+                        
+    print (marklines)
     template = get_template('scatter')
-    scatter = template%(json.dumps(dfs),json.dumps(types))
+    ## markline 变体
+    scatter = template%(json.dumps(dfs),json.dumps(types),json.dumps(marklines))
     output = creat_html(scatter,root,name,width,height) 
     if show:
         return HTML(output)
