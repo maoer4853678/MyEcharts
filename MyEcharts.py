@@ -521,7 +521,7 @@ def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
         df['var3'] = range(20)*50
         Plot_Heatmap(df,'var1',"var2",'var3',root = "html")
     '''
-    if not  pivot_df:
+    if isinstance (pivot_df,type(None)):
         pivot_df = pd.pivot_table(df,values, index ,columns , aggfunc)
     
     pivot_df = pivot_df.fillna(0).round(2) 

@@ -60,14 +60,20 @@ var itemStyle = {
         ],
         grid3D: {},
         xAxis3D: {
-            type: types[0]
+            type: types[0],
+            min:'dataMin',
+            max:'dataMax'
         },
         legend:{data:[]},
         yAxis3D: {
-            type: types[1]
+            type: types[1],
+            min:'dataMin',
+            max:'dataMax'
         },
         zAxis3D: {
-            type: types[2]
+            type: types[2],
+            min:'dataMin',
+            max:'dataMax'
         },
         dataset: [],
         series: [
