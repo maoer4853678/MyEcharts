@@ -196,7 +196,7 @@ def Plot_MBox(df,columns = None,label =None ,root = "html",\
     Example:
         df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
         df['label'] = ['A']*25+['B']*25
-        Plot_Box(df,['var1',"var2",'var4'],'label',root = "html")
+        Plot_MBox(df,['var1',"var2",'var4'],'label',root = "html")
     '''
 
     if label==None:
