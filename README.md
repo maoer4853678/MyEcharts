@@ -55,6 +55,16 @@
 
 ![Image text](./image/box.png)
 
+    Plot_MBox :  绘制多变量的分类Box图
+    Example:
+
+    from MyEcharts import Plot_MBox
+    df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+    df['label'] = ['A']*25+['B']*25
+    Plot_MBox(df,['var1',"var2",'var4'],'label',root = "html")
+
+![Image text](./image/mbox.png)
+
 
     Plot_Scatter :  绘制一对变量的散点图
     Example:
