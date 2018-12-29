@@ -7,6 +7,7 @@ import shutil
 import datetime
 from IPython.display import SVG,HTML
 
+echarts_path = os.path.dirname(__file__)
 #######################################################################
 ## 通用函数
 def siplitlist(listx,n,axis = 0):
@@ -25,7 +26,7 @@ def siplitlist(listx,n,axis = 0):
     return res
     
 def get_template(template):
-    with open("template/%s.html"%template,"r") as  f:
+    with open("%s/template/%s.html"%(echarts_path,template),"r") as  f:
         template = f.read()
     return template
 
@@ -38,12 +39,12 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
         os.makedirs(root)
     jspath = os.path.join(os.path.dirname(root),"js")
     if not os.path.exists(jspath): ## root 所在的根目录没有js文件夹，则将js 文件夹拷贝至此目录下
-        shutil.copytree('./js', jspath)
+        shutil.copytree('%s/js'%echarts_path, jspath)
     else: ## 若存在js文件不全的情况下单独拷贝文件
-        for i in os.listdir('./js'):
+        for i in os.listdir('%s/js'%echarts_path):
             dstFilePath = os.path.join(jspath,i)
             if not os.path.exists(dstFilePath):
-                shutil.copyfile('./js/'+i,dstFilePath) 
+                shutil.copyfile('%s/js'%echarts_path+i,dstFilePath) 
     if os.path.exists("%s/%s.html"%(root,name)):
         filename = "%s/%s"%(root,name)+"_"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")+".html"
     else:
@@ -166,7 +167,10 @@ def Plot_Box(df,columns = None,root = "html",\
         columns = df.columns.values.tolist()
     
     df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])    
-    data = df1.T.values.tolist()
+##    data = df1.T.values.tolist()
+    data = []
+    for col in df1:
+        data.append(df1[col].dropna().values.tolist())
     xaxis = df1.columns.astype(str).values.tolist()
     template = get_template('box')
     linbar = template%(json.dumps(data),json.dumps(xaxis))
@@ -174,7 +178,56 @@ def Plot_Box(df,columns = None,root = "html",\
     if show:
         return HTML(output)
         
-        
+#######################################################################
+## 分类箱线图
+def Plot_MBox(df,columns = None,label =None ,root = "html",\
+        name = "box",width = "900px",height = '400px',show =True):
+    u'''
+    Box箱线图
+    绘制多变量(Number) 的Box图
+    df: 类型 DataFrame
+    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
+    label: 指定的类别标签，默认None 
+    root: 离线网页生成所在目录
+    name: 文件名称
+    width: Output 时显示宽度
+    height: Output 时显示高度
+    show: 在网页中显示Output
+    Example:
+        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
+        df['label'] = ['A']*25+['B']*25
+        Plot_Box(df,['var1',"var2",'var4'],'label',root = "html")
+    '''
+
+    if label==None:
+        return Plot_Box(df,columns ,root , name ,width ,height ,show )
+
+    labels = df[label]
+    df1 = df.drop(label,axis=1)
+    if not columns:
+        columns = df1.columns.values.tolist()
+    
+    df1 = df1[columns].select_dtypes(exclude = ["object","datetime64[ns]"])  
+##    data = df1.T.values.tolist()
+    gs = df1.groupby(labels)
+
+    datas = []
+    xaxis = []
+    for g in gs:
+        xaxis.append(g[0])
+        g = g[1]
+        data = []
+        for col in g:
+            data.append(g[col].dropna().values.tolist())
+        datas.append(data)
+    legend = df1.columns.astype(str).values.tolist()
+    template = get_template('mbox')
+    linbar = template%(json.dumps(datas),json.dumps(legend),json.dumps(xaxis))
+    output = creat_html(linbar,root,name,width,height) 
+    if show:
+        return HTML(output)
+
+    
 #######################################################################
 ## 单变量散点图
 def Plot_Scatter(df,x,y,label =None,markline ={},root = "html",name = "scatter",\
