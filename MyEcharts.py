@@ -9,7 +9,7 @@ import datetime
 import codecs
 from IPython.display import SVG,HTML
 
-FUNCPATH = sys.path[-1]
+FUNCPATH = os.path.dirname(os.path.abspath(__file__))
 SRCPATH = os.getcwd() 
 
 TEMPLATE = os.path.join(FUNCPATH,"template")
