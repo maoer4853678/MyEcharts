@@ -1,13 +1,20 @@
 #coding=utf-8
 import os
+import sys
 import json
 import numpy as np
 import pandas as pd
 import shutil
 import datetime
+import codecs
 from IPython.display import SVG,HTML
 
-echarts_path = os.path.dirname(__file__)
+FUNCPATH = sys.path[-1]
+SRCPATH = os.getcwd() 
+
+TEMPLATE = os.path.join(FUNCPATH,"template")
+JS = os.path.join(FUNCPATH,"js")
+
 #######################################################################
 ## 通用函数
 def siplitlist(listx,n,axis = 0):
@@ -26,11 +33,12 @@ def siplitlist(listx,n,axis = 0):
     return res
     
 def get_template(template):
-    with open("%s/template/%s.html"%(echarts_path,template),"r") as  f:
+    with codecs.open("%s/%s.html"%(TEMPLATE,template),"r",'utf-8') as f:
         template = f.read()
     return template
 
-def creat_html(template,root,name,width = "900px",height = '600px'):
+def creat_html(template,root,name,width = "900px",height = '600px',overwrite = False):
+    root = os.path.join(SRCPATH,root)
     ## name中的 特殊字符处理
     for i in '? * : " < > \ / |'.split(' '):
         name = name.replace(i,'')
@@ -39,30 +47,30 @@ def creat_html(template,root,name,width = "900px",height = '600px'):
         os.makedirs(root)
     jspath = os.path.join(os.path.dirname(root),"js")
     if not os.path.exists(jspath): ## root 所在的根目录没有js文件夹，则将js 文件夹拷贝至此目录下
-        shutil.copytree('%s/js'%echarts_path, jspath)
+        shutil.copytree(JS, jspath)
     else: ## 若存在js文件不全的情况下单独拷贝文件
-        for i in os.listdir('%s/js'%echarts_path):
+        for i in os.listdir(JS):
             dstFilePath = os.path.join(jspath,i)
             if not os.path.exists(dstFilePath):
-                shutil.copyfile('%s/js'%echarts_path+i,dstFilePath) 
-    if os.path.exists("%s/%s.html"%(root,name)):
+                shutil.copyfile(os.path.join(JS,i),dstFilePath) 
+    if os.path.exists("%s/%s.html"%(root,name)) and not overwrite:
         filename = "%s/%s"%(root,name)+"_"+datetime.datetime.now().strftime("%Y%m%d%H%M%S")+".html"
     else:
         filename = "%s/%s.html"%(root,name)
     with open(filename,"w") as  f:
         f.write(template)
-    msg = '<iframe src="%s" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(filename,width,height)
+    msg = '<iframe src="%s" width="%s" height="%s" frameborder="0" scrolling="no"> </iframe>'%(filename.replace(SRCPATH,'.'),width,height)
     return msg
 
 #######################################################################
 ## 时间序列的箱线图
-def tbox_map(root,name,alldata,xdata,lines,width,height):
+def tbox_map(root,name,alldata,xdata,lines,width,height,overwrite):
     template = get_template('tbox')
     box = template%(json.dumps(alldata),json.dumps(xdata),json.dumps(lines))    
-    return creat_html(box,root,name,width,height) 
+    return creat_html(box,root,name,width,height,overwrite) 
       
 def Plot_TBox(df,x,y,kind='date',root='html',name = None,\
-        width = "900px",height = '400px',show =True):
+        width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     按照指定时间窗口绘制 时序Box图，横轴是日期，可选指定变量
     df: 类型 DataFrame
@@ -94,13 +102,13 @@ def Plot_TBox(df,x,y,kind='date',root='html',name = None,\
     
 #######################################################################
 ## 多变量散点图
-def univariate_map(root,name,alldata,column,width,height):
+def univariate_map(root,name,alldata,column,width,height,overwrite):
     template = get_template('univariate')
     scatter = template%(json.dumps(alldata),json.dumps(column))
-    return creat_html(scatter,root,name,width,height)
+    return creat_html(scatter,root,name,width,height,overwrite)
         
 def Plot_Univariate(df,target,label=None,varnum = 10,pagenum = None,\
-        root='html',reverse =False,width = "900px",height = '400px',show =True):
+        root='html',reverse =False,width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     Univariate分析
     绘制单变量和目标变量的散点关系图，可以指定每页含有观察变量个数，按照变量顺序生成
@@ -141,14 +149,14 @@ def Plot_Univariate(df,target,label=None,varnum = 10,pagenum = None,\
             alldata[col] = data
         
         filename = 'univariate_%d'%(index+1)
-        output = univariate_map(root,filename,alldata,column,width,height)
+        output = univariate_map(root,filename,alldata,column,width,height,overwrite)
     if show:
         return HTML(output)
 
 #######################################################################
 ## 箱线图
 def Plot_Box(df,columns = None,root = "html",\
-        name = "box",width = "900px",height = '400px',show =True):
+        name = "box",width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     Box箱线图
     绘制多变量(Number) 的Box图
@@ -167,71 +175,19 @@ def Plot_Box(df,columns = None,root = "html",\
         columns = df.columns.values.tolist()
     
     df1 = df[columns].select_dtypes(exclude = ["object","datetime64[ns]"])    
-##    data = df1.T.values.tolist()
-    data = []
-    for col in df1:
-        data.append(df1[col].dropna().values.tolist())
+    data = df1.T.values.tolist()
     xaxis = df1.columns.astype(str).values.tolist()
     template = get_template('box')
     linbar = template%(json.dumps(data),json.dumps(xaxis))
-    output = creat_html(linbar,root,name,width,height) 
+    output = creat_html(linbar,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
         
-#######################################################################
-## 分类箱线图
-def Plot_MBox(df,columns = None,label =None ,root = "html",\
-        name = "box",width = "900px",height = '400px',show =True):
-    u'''
-    Box箱线图
-    绘制多变量(Number) 的Box图
-    df: 类型 DataFrame
-    columns: 要绘制的变量组[]，默认是None ,即df的全部字段
-    label: 指定的类别标签，默认None 
-    root: 离线网页生成所在目录
-    name: 文件名称
-    width: Output 时显示宽度
-    height: Output 时显示高度
-    show: 在网页中显示Output
-    Example:
-        df = pd.DataFrame(np.random.rand(50,4),columns = ['var1','var2','var3','var4'])
-        df['label'] = ['A']*25+['B']*25
-        Plot_MBox(df,['var1',"var2",'var4'],'label',root = "html")
-    '''
-
-    if label==None:
-        return Plot_Box(df,columns ,root , name ,width ,height ,show )
-
-    labels = df[label]
-    df1 = df.drop(label,axis=1)
-    if not columns:
-        columns = df1.columns.values.tolist()
-    
-    df1 = df1[columns].select_dtypes(exclude = ["object","datetime64[ns]"])  
-##    data = df1.T.values.tolist()
-    gs = df1.groupby(labels)
-
-    datas = []
-    xaxis = []
-    for g in gs:
-        xaxis.append(g[0])
-        g = g[1]
-        data = []
-        for col in g:
-            data.append(g[col].dropna().values.tolist())
-        datas.append(data)
-    legend = df1.columns.astype(str).values.tolist()
-    template = get_template('mbox')
-    linbar = template%(json.dumps(datas),json.dumps(legend),json.dumps(xaxis))
-    output = creat_html(linbar,root,name,width,height) 
-    if show:
-        return HTML(output)
-
-    
+        
 #######################################################################
 ## 单变量散点图
 def Plot_Scatter(df,x,y,label =None,markline ={},root = "html",name = "scatter",\
-        width = "900px",height = '400px',show =True):
+        width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     Scatter分类分析
     绘制变量之间的简单散点关系图
@@ -289,7 +245,7 @@ def Plot_Scatter(df,x,y,label =None,markline ={},root = "html",name = "scatter",
     template = get_template('scatter')
     ## markline 变体
     scatter = template%(json.dumps(dfs),json.dumps(types),json.dumps(marklines))
-    output = creat_html(scatter,root,name,width,height) 
+    output = creat_html(scatter,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
     
@@ -297,7 +253,7 @@ def Plot_Scatter(df,x,y,label =None,markline ={},root = "html",name = "scatter",
 ## 线柱图  
     
 def Plot_LineBar(df,columns = None,kind = "line",root = "html",\
-        name = "Linebar",width = "900px",height = '400px',show =True):
+        name = "Linebar",width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     LineBar分类分析
     绘制多变量(Number) 的Line图或Bar图，支持在线切换
@@ -342,7 +298,7 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "html",\
     xaxis = df.index.astype(str).values.tolist()
     template = get_template('linbar')
     linbar = template%(json.dumps(data),json.dumps(xaxis))
-    output = creat_html(linbar,root,name,width,height) 
+    output = creat_html(linbar,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
     
@@ -366,7 +322,7 @@ def hist_map(g,bins,scale = False):
     return temp.reset_index().values.tolist()
 
 def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "html",name = "hist",\
-        width = "900px",height = '400px',show =True):
+        width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     Hist分布图
     绘制多变量(Number) 的hist分布图
@@ -409,7 +365,7 @@ def Plot_Hist(df,columns = None,bins = 10,scale = False,root = "html",name = "hi
 
     template = get_template('hist')
     hist = template%(json.dumps(data))
-    output = creat_html(hist,root,name,width,height) 
+    output = creat_html(hist,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
 
@@ -512,7 +468,7 @@ def pie_map(g,top):
     return {"legend":legend,"series":series}
 
 def Plot_Pie(df,columns = None,top = 8,root = "html",\
-        name = "pie",width = "900px",height = '400px',show =True):
+        name = "pie",width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     绘制多变量的Pie图,最多支持4个变量同时显示,支持自动布局
     df: 类型 DataFrame
@@ -540,7 +496,7 @@ def Plot_Pie(df,columns = None,top = 8,root = "html",\
     legend,series = pie_axisdata(columns)
     template = get_template('pie')
     pie = template%(json.dumps(alldata),legend,series)
-    output = creat_html(pie,root,name,width,height) 
+    output = creat_html(pie,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
 
@@ -550,7 +506,7 @@ def Plot_Pie(df,columns = None,top = 8,root = "html",\
     
 def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
     pivot_df = None,root = "html",name = "heatmap",width = "900px",\
-    height = '400px',show =True):
+    height = '400px',show =True,overwrite=False):
     u'''
     热力图分析
     df: 类型 DataFrame
@@ -574,7 +530,7 @@ def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
         df['var3'] = range(20)*50
         Plot_Heatmap(df,'var1',"var2",'var3',root = "html")
     '''
-    if isinstance (pivot_df,type(None)):
+    if not  pivot_df:
         pivot_df = pd.pivot_table(df,values, index ,columns , aggfunc)
     
     pivot_df = pivot_df.fillna(0).round(2) 
@@ -588,7 +544,7 @@ def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
                 json.dumps(pivot_df.columns.astype(str).tolist()),
                 json.dumps(v),
                 json.dumps([pivot_df.min().min(),pivot_df.max().max()]))
-    output = creat_html(heatmap,root,name,width,height) 
+    output = creat_html(heatmap,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
 
@@ -597,7 +553,7 @@ def Plot_Heatmap(df,values=None, index=None, columns=None ,aggfunc= sum,\
 ## 热力图  
     
 def Plot_Calendar(df,values=None, date=None,aggfunc= sum,root = "html",\
-    name = "calendar",width = "900px",height = '400px',show =True):
+    name = "calendar",width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     日历热力图分析 , 日历坐标系显示热力图 ,支持自动按年分类
     df: 类型 DataFrame
@@ -646,7 +602,7 @@ def Plot_Calendar(df,values=None, date=None,aggfunc= sum,root = "html",\
     mm = [mm.min().min(),mm.max().max()]
     template = get_template('calendar')
     calendar = template%(json.dumps(alldata),json.dumps(mm))
-    output = creat_html(calendar,root,name,width,height) 
+    output = creat_html(calendar,root,name,width,height,overwrite) 
     if show:
         return HTML(output)  
    
@@ -659,7 +615,7 @@ def Scatter3d_map(df):
     return data
 
 def Plot_3DScatter(df,x,y,z,label =None,other = None,visualmap=True,root = "html",name = "3dscatter",\
-        width = "900px",height = '400px',show =True):
+        width = "900px",height = '400px',show =True,overwrite=False):
     u'''
     3DScatter分类分析
     绘制3D散点图
@@ -714,7 +670,7 @@ def Plot_3DScatter(df,x,y,z,label =None,other = None,visualmap=True,root = "html
     template = get_template('3dscatter')
     scatter = template%(json.dumps(dfs),json.dumps(types),\
         json.dumps(columns),other,json.dumps(mm),str(visualmap*1))
-    output = creat_html(scatter,root,name,width,height) 
+    output = creat_html(scatter,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
         
@@ -724,7 +680,7 @@ def Plot_3DScatter(df,x,y,z,label =None,other = None,visualmap=True,root = "html
         
 def Plot_3DBar(df,values=None, index=None, columns=None ,aggfunc= sum,\
     pivot_df = None,root = "html",name = "3dbar",width = "900px",\
-    height = '400px',show =True):
+    height = '400px',show =True,overwrite =False):
     u'''
     3D柱状图分析
     df: 类型 DataFrame
@@ -767,6 +723,6 @@ def Plot_3DBar(df,values=None, index=None, columns=None ,aggfunc= sum,\
                 json.dumps(pivot_df.columns.astype(str).tolist()),
                 json.dumps(v),
                 json.dumps(mm))
-    output = creat_html(bar,root,name,width,height) 
+    output = creat_html(bar,root,name,width,height,overwrite) 
     if show:
         return HTML(output)
