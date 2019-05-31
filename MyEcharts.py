@@ -278,7 +278,7 @@ def Plot_LineBar(df,columns = None,kind = "line",root = "html",\
         d = dict(zip(columns,kind))
     elif isinstance(kind,dict):
         d = kind
-    elif isinstance(kind,str) or isinstance(kind,unicode): 
+    elif isinstance(kind,str): 
         d = {}
         curkind = kind
     else:

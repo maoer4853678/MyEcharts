@@ -2,19 +2,17 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>单变量散点图</title>
-    <!-- 引入 echarts.js -->
+    <title>Univariate</title>
+    <!-- import echarts.js -->
     <script src="../js/echarts.min.js"></script>
     <script src="../js/dataTool.min.js"></script>
     <script src="../js/jquery.js"></script>
 </head>
 <body >
-    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <select id="variates" onchange="Change(this)" > </select>
     <input  id = "trackBar" type="range" min="0" max="50" value="10" onchange="ChangeSym() " />
     <div id="main" style="width: 1500px;height:470px;"></div>
     <script type="text/javascript">
-        // 基于准备好的dom，初始化echarts实例
 
     var myChart = document.getElementById('main');
     if (window.innerWidth>50) 
@@ -120,13 +118,11 @@ option = {
     }
 
     function ChangeSym(){
-        //获取信息
         var value = parseFloat($("#trackBar").val());
         for (var i=0;i<option.series.length;i++) {
             option.series[i].symbolSize = value
         }
         myChart.setOption(option);
-        //将信息显示
     }
 
     </script>
